@@ -6,11 +6,11 @@ namespace CopyDel.Models
 {
     public static class StringExtension
     {
-        public static string GetMD5Checksum(this string str)
-        {
-            MD5 md5 = new MD5CryptoServiceProvider();
-            return BitConverter.ToString(md5.ComputeHash(Encoding.ASCII.GetBytes(str)));
-        }
+            public static string GetMD5Checksum(this string str)
+            {
+                MD5 md5 = new MD5CryptoServiceProvider();
+                return BitConverter.ToString(md5.ComputeHash(Encoding.ASCII.GetBytes(str)));
+            }
 
         public static string FirstOf(this string str, char Of)
         {

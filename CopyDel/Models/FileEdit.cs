@@ -7,15 +7,13 @@ using System.IO;
 
 namespace CopyDel.Models
 {
-
     class FileEdit
     {
-        List<CopyList> CList;
+        private string StrException;
 
-        string MainDir = "";
         public string AutoLoade()
         {
-            string LoadeInfo = "";
+            string LoadeInfo = string.Empty;
             string[] FiletoLoad = GetAutoSaveFilesList();
 
             foreach (string LFile in FiletoLoad)
@@ -24,75 +22,68 @@ namespace CopyDel.Models
                 {
                     try
                     {
-                        StreamReader sr = new StreamReader(LFile);
-                        LoadeInfo = sr.ReadToEnd();
-                        sr.Close();
+                        using (StreamReader sr = new StreamReader(LFile))
+                        {
+                            LoadeInfo = sr.ReadToEnd();
+                            sr.Close();
+                        }
                     }
-                    catch { };
+                    catch (Exception e) { SetExeption(e); }
                 }
             }
             return LoadeInfo;
         }
+
         public bool AutoSave(string[] Info)
         {
-            bool fl = false;
             string[] FiletoSave = GetAutoSaveFilesList();
+            if (Info.Length == 0 || FiletoSave.Length == 0) return false;
 
             string str = "";
             foreach (string txt in Info) str += txt + "\r";
-            Byte[] info = new UTF8Encoding(true).GetBytes(str);
 
             foreach (string FtoSave in FiletoSave)
             {
-                if (Directory.Exists(Path.GetDirectoryName(FtoSave)))
-                {
-                    try
-                    {
-                        using (FileStream fs = File.Create(FtoSave))
-                        {
-                            if (str.Length != 0) fs.Write(info, 0, info.Length);
-                            else fl = false;
-                        }
-                    }
-                    catch { };
-                }
+                if (ChkFile(FtoSave)) SetFileString(FtoSave, str);
             }
-            return fl;
+            return false;
         }
 
         public bool ChkDir(string dir)
         {
-            bool fl = false;
-            if (Directory.Exists(dir) != true)
+            if (!Directory.Exists(dir))
             {
                 DirectoryInfo tmpdir = new DirectoryInfo(dir);
                 try
                 {
                     tmpdir.Create();
                 }
-                catch { }
-                if (Directory.Exists(dir)) fl = true;
+                catch (Exception e) { SetExeption(e); }
+                if (Directory.Exists(dir)) return true;
             }
-            else fl = true;
-            return fl;
+            else return true;
+            return false;
         }
 
         public bool ChkFile(string file)
         {
-            if (File.Exists(file) != true)
+            if (!File.Exists(file))
             {
                 try
                 {
-                    File.Create(file).Close();
+                    using (FileStream fs = File.Create(file))
+                    {
+                        if (File.Exists(file)) return true;
+                    }
                 }
-                catch { }
-                if (File.Exists(file)) return true;
-                else return false;
+                catch (Exception e) { SetExeption(e); }
+                return false;
             }
+
             return true;
         }
 
-        private string ComputeMD5Checksum(string path)
+        public string ComputeMD5Checksum(string path)
         {
             using (FileStream fs = File.OpenRead(path))
             {
@@ -104,74 +95,60 @@ namespace CopyDel.Models
             }
         }
 
-        public void CopyDel(string dir, int Lv = 0)
-        {
-            CList = new List<CopyList>();
-            if (Directory.Exists(dir) == true)
-            {
-                if (Lv == 0)
-                {
-                    string[] files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
-                    if (files.Length != 0) { foreach (string file in files) { string md5 = ComputeMD5Checksum(file); CopyList elm = new CopyList(file, md5, -1); CList.Add(elm); } }
-                }
-                else
-                {
-                    string[] files = Directory.GetFiles(dir, "*.*", SearchOption.TopDirectoryOnly);
-                    if (files.Length != 0) { foreach (string file in files) { string md5 = ComputeMD5Checksum(file); CopyList elm = new CopyList(file, md5, -1); CList.Add(elm); } }
-                }
-
-                if (CList.Count() != 0)
-                {
-                    int i = 0, j = 0;
-                    for (i = 0; i < CList.Count() - 1; i++)
-                    {
-                        string HeshI = CList[i].Hesh;
-                        for (j = i + 1; j < CList.Count(); j++)
-                        {
-                            if (CList[j].Copy == -1 && HeshI == CList[j].Hesh)
-                            {
-                                CList[i].Copy = i;
-                                CList[j].Copy = i;
-                            }
-                        }
-                    }
-
-                    for (i = 0; i < CList.Count; i++) if (CList[i].Copy != -1 && CList[i].Copy != i) File.Delete(CList[i].File);
-                }
-            }
-        }
-
         public string DirFile(string Dir, string File)
         {
             if (Dir[Dir.Length - 1] == '\\') Dir = Dir.Substring(0, Dir.Length - 1);
             if (File[0] == '\\') File = File.Substring(1);
-            MainDir = Dir + "\\" + File;
-            return MainDir;
+            return Dir + "\\" + File;
         }
+
         public bool DirRename(string Dir, string NewDir)
         {
-            bool Fl = false;
             DirectoryInfo CorDir = new DirectoryInfo(Dir);
             CorDir.MoveTo(NewDir);
-            if (CorDir.Exists) Fl = true;
-            else Fl = false;
-            return Fl;
+            if (CorDir.Exists) return true;
+            else return false;
         }
 
-        public bool DiskSame(string Dir, string Dir2)
+        public bool FileRename(string File, string NewFile)
         {
-            bool fl = false;
-            if (Dir.IndexOf(@":\") == 1 && Dir2.IndexOf(@":\") == 1)
-            {
-                Dir = Dir.ToLower();
-                Dir2 = Dir2.ToLower();
-                if (Dir[0] == Dir2[0]) fl = true;
-            }
-            return fl;
+            FileInfo CorFile = new FileInfo(File);
+            CorFile.MoveTo(NewFile);
+            if (CorFile.Exists) return true;
+            else return false;
         }
+
+        internal bool IsSameDisk(string Dir, string Dir2)
+        {
+            if (Dir != null && Dir2 != null)
+            {
+                if (Dir.Length > 3 && Dir2.Length > 3)
+                {
+                    if (Dir.IndexOf(@":\") == 1 && Dir2.IndexOf(@":\") == 1)
+                    {
+                        Dir = Dir.ToLower();
+                        Dir2 = Dir2.ToLower();
+                        if (Dir[0] == Dir2[0]) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        internal bool IsSameDir(string DirFrom, string DirTo)
+        {
+            if (DirFrom != null && DirTo != null)
+            {
+                if (DirFrom.Length > 1 && DirTo.Length > 1)
+                {
+                    if (DirFrom.IndexOf(DirTo) != -1 || DirTo.IndexOf(DirFrom) != -1) return true;
+                }
+            }
+            return false;
+        }
+
         internal string GetAutoLoadeFirstFile()
         {
-
             string LoadeFile = "";
             string[] FiletoLoad = GetAutoSaveFilesList();
 
@@ -203,20 +180,9 @@ namespace CopyDel.Models
             return AutoSaveFilesList;
         }
 
-        public bool FileRename(string File, string NewFile)
-        {
-            bool Fl = false;
-            FileInfo CorFile = new FileInfo(File);
-            CorFile.MoveTo(NewFile);
-            if (CorFile.Exists) Fl = true;
-            else Fl = false;
-            return Fl;
-        }
-
         public List<string> GetFileList(string file)
         {
             List<string> FileList = new List<string>();
-
             if (File.Exists(file))
                 FileList = File.ReadAllLines(file).ToList();
             return FileList;
@@ -224,15 +190,13 @@ namespace CopyDel.Models
 
         public List<string> GetFileList(string file, int nEncoding)
         {
-
             string encoding = "utf-8";
             if (nEncoding == 1)
                 encoding = "windows-1251";
 
-            List<string> FileList = new List<string>();
-            if (encoding == null) return GetFileList(file);
-            if (encoding.Length == 0) return GetFileList(file);
+            if (encoding == null || encoding.Length == 0) return GetFileList(file);
 
+            List<string> FileList = new List<string>();
             if (File.Exists(file))
                 FileList = File.ReadAllLines(file, Encoding.GetEncoding(encoding)).ToList();
             return FileList;
@@ -240,29 +204,12 @@ namespace CopyDel.Models
 
         public List<string> GetFileList(string file, string encoding)
         {
-            List<string> FileList = new List<string>();
-            if (encoding == null) return GetFileList(file);
-            if (encoding.Length == 0) return GetFileList(file);
+            if (encoding == null || encoding.Length == 0) return GetFileList(file);
 
+            List<string> FileList = new List<string>();
             if (File.Exists(file))
                 FileList = File.ReadAllLines(file, Encoding.GetEncoding(encoding)).ToList();
             return FileList;
-        }
-
-        public bool SetFileList(string file, List<string> fileList)
-        {
-            bool fl = false;
-
-            if (ChkFile(file))
-            {
-                FileStream f1 = new FileStream(file, FileMode.Truncate, FileAccess.Write, FileShare.Read);
-                StreamWriter sw = new StreamWriter(f1, Encoding.UTF8);
-                foreach (string txt in fileList) sw.WriteLine(txt);
-                sw.Dispose();
-                fl = true;
-            }
-
-            return fl;
         }
 
         public bool SetFileList(string file, List<string> fileList, int nEncoding)
@@ -275,17 +222,68 @@ namespace CopyDel.Models
 
         public bool SetFileList(string file, List<string> fileList, string encoding = "utf-8")
         {
-            bool fl = false;
-
-            if (ChkFile(file))
+            try
             {
                 FileStream f1 = new FileStream(file, FileMode.Truncate, FileAccess.Write, FileShare.Read);
-                StreamWriter sw = new StreamWriter(f1, Encoding.GetEncoding(encoding));
-                foreach (string txt in fileList) sw.WriteLine(txt);
-                sw.Dispose();
-                fl = true;
+                using (StreamWriter sw = new StreamWriter(f1, Encoding.GetEncoding(encoding)))
+                {
+                    foreach (string txt in fileList) sw.WriteLine(txt);
+                }
             }
-            return fl;
+            catch (Exception e)
+            {
+                SetExeption(e);
+                return false;
+            }
+            return true;
         }
+
+        public bool SetFileString(string file, string text)
+        {
+            try
+            {
+                FileStream fs = new FileStream(file, FileMode.Truncate, FileAccess.Write, FileShare.Read);
+                using (StreamWriter writetext = new StreamWriter(fs))
+                {
+                    writetext.WriteLine(text);
+                }
+            }
+            catch (Exception e)
+            {
+                SetExeption(e);
+                return false;
+            }
+            return true;
+        }
+
+        public FileInfo[] SearchFiles(string dir)
+        {
+            return SearchFiles(dir, new string[] { "*.*" });
+        }
+
+        public FileInfo[] SearchFiles(string dir, string[] filter, int Lv = 0)
+        {
+            //Lv
+            //0 All filles
+            //1 TopDirectoryOnly
+            //2 From TopDirectoryOnly to 1DirLv
+            //3 From TopDirectoryOnly to 2DirLv
+            //-1 Jist DirL1 1
+            //-2 Jist DirL1 2
+
+            FileInfo[] fileList = new FileInfo[] { };
+
+            if (Directory.Exists(dir))
+            {
+                DirectoryInfo DI = new DirectoryInfo(dir);
+
+                if (Lv == 0) fileList = filter.SelectMany(fi => DI.GetFiles(fi, SearchOption.AllDirectories)).Distinct().ToArray();
+                else fileList = filter.SelectMany(fi => DI.GetFiles(fi, SearchOption.TopDirectoryOnly)).Distinct().ToArray();
+            }
+            return fileList;
+        }
+
+        public string GetExeption() { return StrException; }
+        public void SetExeption(Exception e) { StrException = e.Message.ToString(); }
     }
 }

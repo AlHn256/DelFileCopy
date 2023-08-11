@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
-using System.Security.Cryptography;
 using CopyDel.Models;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Drawing;
 
 namespace CopyDel
 {
     public partial class Form1 : Form
     {
-        //string Dir = @"D:\Pr";
-        string Dir = @"E:\X File I\Pic";
-        //string Dir = @"F:\img\test\";
+        string Dir = @"E:\Test";
         List<CopyList> CheckFileList;
         private object _context;
         private FileList fileList;
-
 
         public Form1()
         {
@@ -41,229 +38,137 @@ namespace CopyDel
             _context = SynchronizationContext.Current;
         }
 
-        private string ComputeMD5Checksum(string path)
+        private async void FindCopy(bool Del)
         {
-            using (FileStream fs = File.OpenRead(path))
+            if(dataGru.RowCount>0 && Del)
             {
-                MD5 md5 = new MD5CryptoServiceProvider();
-                byte[] fileData = new byte[fs.Length];
-                fs.Read(fileData, 0, (int)fs.Length);
-                byte[] checkSum = md5.ComputeHash(fileData);
-                //string result = BitConverter.ToString(checkSum).Replace("-", String.Empty);
-                string result = BitConverter.ToString(checkSum);
-                return result;
+                for(int i= dataGru.RowCount-1; i>-1 ; i--)
+                {
+                    bool ForDel = (bool)dataGru["ForDel", i].Value;
+                    if(ForDel) richTextBox1.Text += DelFile(dataGru["File", i].Value.ToString(), i);
+                }
+            }
+            else
+            {
+                CheckFileList = new List<CopyList>();
+                if (Directory.Exists(Dir))
+                {
+                    long maxLenghtFile = 0;
+                    long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
+                    fileList = new FileList(Dir, maxLenghtFile, checkFilesBox.Checked);
+                    fileList.ProcessChanged += worker_ProcessChanged;
+
+                    string text = string.Empty;
+                    richTextBox1.Text += "Start search" + "\nDir - " + Dir;
+                    await Task.Run(() => { fileList.MadeList(_context); });
+                    CheckFileList = fileList.GetList();
+                    richTextBox1.Text += "\nFinish " + CheckFileList.Count();
+
+                    int i = 0, j = 0;
+                    for (i = 0; i < CheckFileList.Count() - 1; i++)
+                    {
+                        string heshI = CheckFileList[i].Hesh;
+                        long fileLength = CheckFileList[i].FileLength;
+
+                        for (j = i + 1; j < CheckFileList.Count(); j++)
+                        {
+                            if (fileLength != 0)
+                            {
+                                if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
+                                {
+                                    CheckFileList[i].Copy = i;
+                                    CheckFileList[j].Copy = i;
+                                }
+                            }
+                            else
+                            {
+                                if (CheckFileList[j].Copy == -1 && heshI == CheckFileList[j].Hesh)
+                                {
+                                    CheckFileList[i].Copy = i;
+                                    CheckFileList[j].Copy = i;
+                                }
+                            }
+                        }
+                    }
+
+                    var copyList = CheckFileList.Where(x => x.Copy != -1).OrderBy(y => y.Copy).ToList();
+                    if (copyList.Count > 0)
+                    {
+                        i = 0;
+                        int nDelFiles = 0;
+                        foreach (var elem in copyList)
+                        {
+                            if (i == elem.Copy)
+                            {
+                                elem.ForDel = true;
+                                if (Del)
+                                {
+                                    File.Delete(elem.File);
+                                    if (!File.Exists(elem.File)) nDelFiles++;
+                                    if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  - DELETED by HeshCOPY";
+                                    else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  - DELETED by LengthCOPY";
+                                }
+                                else
+                                {
+                                    if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
+                                    else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY FOR DELETE";
+                                }
+                            }
+                            else
+                            {
+                                if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
+                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY";
+                            }
+                            i = elem.Copy;
+                        }
+                        if (nDelFiles > 0) text += "\n" + nDelFiles + " Deleted Files!!!";
+                    }
+
+                    RefreshDataGru(copyList);
+                    richTextBox1.Text = text += "\n\n" + copyList.Count + " kопий ";
+                }
             }
         }
 
-
-        private async void FindCopy(bool Del)
+        private void RefreshDataGru(List<CopyList> copyList)
         {
-            CheckFileList = new List<CopyList>();
-
-
-            if (Directory.Exists(Dir))
+            BindingSource bind = new BindingSource { DataSource = copyList };
+            dataGru.DataSource = bind;
+            dataGru.Columns["File"].Width = 750;
+            dataGru.Columns["ForDel"].Width = 35;
+            dataGru.Columns["Hesh"].Width = 220;
+            dataGru.Columns["Copy"].Width = 60;
+            dataGru.Columns["FileLength"].Width = 60;
+            if (!dataGru.Columns.Contains("Del"))
             {
-                long maxLenghtFile = 0;
-                long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-                fileList = new FileList(Dir, maxLenghtFile, checkFilesBox.Checked);
-                fileList.ProcessChanged += worker_ProcessChanged;
-
-                string text = "\nDir - " + Dir+ "\nStart";
-                await Task.Run(() => { fileList.MadeList(_context); });
-
-                CheckFileList = fileList.GetList();
-                richTextBox1.Text += "\nFinish " + CheckFileList.Count();
-
-
-                int i = 0, j = 0;
-                for (i = 0; i < CheckFileList.Count() - 1; i++)
-                {
-                    string heshI = CheckFileList[i].Hesh;
-                    long fileLength = CheckFileList[i].FileLength;
-
-                    for (j = i + 1; j < CheckFileList.Count(); j++)
-                    {
-                        if (fileLength != 0)
-                        {
-                            if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
-                            {
-                                CheckFileList[i].Copy = i;
-                                CheckFileList[j].Copy = i;
-                            }
-                        }
-                        else
-                        {
-                            if (CheckFileList[j].Copy == -1 && heshI == CheckFileList[j].Hesh)
-                            {
-                                CheckFileList[i].Copy = i;
-                                CheckFileList[j].Copy = i;
-                            }
-                        }
-                    }
-                }
-
-
-
-                var copyList = CheckFileList.Where(x => x.Copy != -1).OrderBy(y => y.Copy).ToList();
-
-                if (copyList.Count > 0)
-                {
-                    i = 0;
-                    foreach (var elem in copyList)
-                    {
-                        if (elem.FileLength == 0)
-                        {
-                            if (i != elem.Copy)
-                            {
-                                text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
-                            }
-                            else
-                            {
-                                text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
-                            }
-                        }
-                        else
-                        {
-                            if (i != elem.Copy)
-                            {
-                                text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY";
-                            }
-                            else
-                            {
-                                text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY FOR DELETE";
-                            }
-                        }
-                        i = elem.Copy;
-                    }
-                }
-
-                //for (i = 0; i < CheckFileList.Count; i++)
-                //{
-                //    if (CheckFileList[i].Copy != -1 && CheckFileList[i].Copy != i)
-                //    {
-                //        j++;
-                //        text += "\n" + i + " " + CheckFileList[i].Copy + " " + CheckFileList[i].File + " " + CheckFileList[i].Hesh + "    -    COPY";
-                //        if (Del == true) { File.Delete(CheckFileList[i].File); text += "\n" + CheckFileList[i].File + "    -   DEL"; }
-                //    }
-                //}
-
-                //text += "\n\n" + copyList.Count + " Копий из " + dirs.Length + "файлов";
-                richTextBox1.Text = text += "\n\n" + copyList.Count + " kопий "; 
+                DataGridViewButtonColumn DelButtonColumn = new DataGridViewButtonColumn();
+                DelButtonColumn.Visible = true;
+                DelButtonColumn.Text = "Del";
+                DelButtonColumn.Name = "Del";
+                DelButtonColumn.HeaderText = "Del";
+                DelButtonColumn.FlatStyle = FlatStyle.Popup;
+                DelButtonColumn.UseColumnTextForButtonValue = true;
+                DelButtonColumn.Width = 30;
+                dataGru.Columns.Add(DelButtonColumn);
+            }
+            if (!dataGru.Columns.Contains("Dir"))
+            {
+                DataGridViewButtonColumn DirButtonColumn = new DataGridViewButtonColumn();
+                DirButtonColumn.Visible = true;
+                DirButtonColumn.Text = "Dir";
+                DirButtonColumn.Name = "Dir";
+                DirButtonColumn.HeaderText = "Dir";
+                DirButtonColumn.FlatStyle = FlatStyle.Popup;
+                DirButtonColumn.UseColumnTextForButtonValue = true;
+                DirButtonColumn.Width = 30;
+                dataGru.Columns.Add(DirButtonColumn);
             }
 
-            //if (Directory.Exists(Dir))
-            //{
-            //    string text = "\nDir - " + Dir;
-            //    string[] dirs = Directory.GetFiles(Dir, "*.*");
-
-            //    if (dirs.Length != 0)
-            //    {
-            //        long maxLenghtFile = 0;
-            //        long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-
-
-            //        foreach (string file in dirs)
-            //        {
-            //            FileInfo fileInf = new FileInfo(file);
-            //            if (maxLenghtFile == 0)
-            //            {
-            //                string md5 = ComputeMD5Checksum(file);
-            //                CheckFileList.Add(new CopyList(file, md5, fileInf.Length));
-            //            }
-            //            else
-            //            {
-            //                if (fileInf.Length < maxLenghtFile)
-            //                {
-            //                    string md5 = ComputeMD5Checksum(file);
-            //                    CheckFileList.Add(new CopyList(file, md5, fileInf.Length));
-            //                }
-            //                else
-            //                {
-            //                    CheckFileList.Add(new CopyList(file, "", fileInf.Length));
-            //                }
-            //            }
-            //        }
-
-
-
-            //        int i = 0, j = 0;
-            //        for (i = 0; i < CheckFileList.Count() - 1; i++)
-            //        {
-            //            string heshI = CheckFileList[i].Hesh;
-            //            long fileLength = CheckFileList[i].FileLength;
-
-            //            for (j = i + 1; j < CheckFileList.Count(); j++)
-            //            {
-            //                if (fileLength != 0)
-            //                {
-            //                    if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
-            //                    {
-            //                        CheckFileList[i].Copy = i;
-            //                        CheckFileList[j].Copy = i;
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    if (CheckFileList[j].Copy == -1 && heshI == CheckFileList[j].Hesh)
-            //                    {
-            //                        CheckFileList[i].Copy = i;
-            //                        CheckFileList[j].Copy = i;
-            //                    }
-            //                }
-            //            }
-            //        }
-
-
-
-            //        var copyList = CheckFileList.Where(x => x.Copy != -1).OrderBy(y => y.Copy).ToList();
-
-            //        if (copyList.Count > 0)
-            //        {
-            //            i = 0;
-            //            foreach (var elem in copyList)
-            //            {
-            //                if (elem.FileLength == 0)
-            //                {
-
-            //                    if (i != elem.Copy)
-            //                    {
-            //                        text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
-            //                    }
-            //                    else
-            //                    {
-            //                        text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
-            //                    }
-
-            //                }
-            //                else
-            //                {
-            //                    if (i != elem.Copy)
-            //                    {
-            //                        text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY";
-            //                    }
-            //                    else
-            //                    {
-            //                        text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY FOR DELETE";
-            //                    }
-            //                }
-            //                i = elem.Copy;
-            //            }
-            //        }
-
-            //        //for (i = 0; i < CheckFileList.Count; i++)
-            //        //{
-            //        //    if (CheckFileList[i].Copy != -1 && CheckFileList[i].Copy != i)
-            //        //    {
-            //        //        j++;
-            //        //        text += "\n" + i + " " + CheckFileList[i].Copy + " " + CheckFileList[i].File + " " + CheckFileList[i].Hesh + "    -    COPY";
-            //        //        if (Del == true) { File.Delete(CheckFileList[i].File); text += "\n" + CheckFileList[i].File + "    -   DEL"; }
-            //        //    }
-            //        //}
-
-            //        text += "\n\n" + copyList.Count + " Копий из " + dirs.Length + "файлов";
-            //        richTextBox1.Text = text;
-            //    }
-            //}
+            foreach (DataGridViewRow row in dataGru.Rows)
+                if ((bool)row.Cells["ForDel"].Value)
+                {
+                    row.DefaultCellStyle.BackColor = Color.DimGray;
+                }
         }
 
         private void test_Click(object sender, EventArgs e) { FindCopy(true); }
@@ -288,33 +193,7 @@ namespace CopyDel
 
             if (!long.TryParse(MaxLenghtFile.Text, out Long))
             {
-
                 MaxLenghtFile.Text = "0";
-            }
-        }
-
-        private void TestButton_Click(object sender, EventArgs e)
-        {
-            Metode();
-        }
-
-
-
-
-        async void Metode()
-        {
-
-            if (Directory.Exists(Dir))
-            {
-                long maxLenghtFile = 0;
-                long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-                fileList = new FileList(Dir, maxLenghtFile);
-                fileList.ProcessChanged += worker_ProcessChanged;
-
-                richTextBox1.Text = "Start";
-                await Task.Run(() =>{fileList.MadeList(_context);});
-                richTextBox1.Text += "\nFinish "+ fileList.GetList().Count();
-
             }
         }
 
@@ -325,7 +204,44 @@ namespace CopyDel
 
         private void StopButton_Click(object sender, EventArgs e)
         {
-            progressBar1.Value = 0;
+            if(fileList!=null) fileList.Cansel(); 
+        }
+
+        private void DataGru_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex > -1)
+            {
+                string file = dataGru["File", e.RowIndex].Value.ToString();
+                string dir = Path.GetDirectoryName(file);
+                var asd = dataGru.Columns[e.ColumnIndex].Name;
+                if (dataGru.Columns[e.ColumnIndex].Name == "Del")
+                {
+                    richTextBox1.Text += DelFile(file, e.RowIndex);
+
+                }
+                if (dataGru.Columns[e.ColumnIndex].Name == "Dir")
+                {
+                    var proc = new System.Diagnostics.Process();
+                    proc.StartInfo.FileName = dir;
+                    proc.StartInfo.UseShellExecute = true;
+                    proc.Start();
+                }
+            }
+        }
+
+        private string DelFile(string file, int rowIndex)
+        {
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+                if (!File.Exists(file))
+                {
+
+                    dataGru.Rows.RemoveAt(rowIndex);
+                    return file + " deleted!\n";
+                }
+            }
+            return file + " deleted Err!!!\n";
         }
     }
 }

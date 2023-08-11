@@ -48,6 +48,8 @@ namespace CopyDel.Models
                 int i = 0;
                 foreach (string file in dirs)
                 {
+                    if (_canselled) break;
+
                     FileInfo fileInf = new FileInfo(file);
                     if (MaxLenghtFile == 0)
                     {

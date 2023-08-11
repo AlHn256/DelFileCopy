@@ -3,16 +3,10 @@
     public class CopyList
     {
         public string File { get; set; }
+        public bool ForDel { get; set; }
         public string Hesh { get; set; }
         public int Copy { get; set; }
         public long FileLength { get; set; }
-        public CopyList(string file, string hesh, long fileLength, int copy)
-        {
-            File = file;
-            Hesh = hesh;
-            FileLength = fileLength;
-            Copy = copy;
-        }
         public CopyList(string file, string hesh, int copy)
         {
             File = file;
