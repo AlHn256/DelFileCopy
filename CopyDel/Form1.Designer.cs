@@ -39,6 +39,7 @@
             this.checkFilesBox = new System.Windows.Forms.CheckBox();
             this.dataGru = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
+            this.checkBoxByDir = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGru)).BeginInit();
             this.SuspendLayout();
             // 
@@ -91,6 +92,7 @@
             this.MaxLenghtFile.Name = "MaxLenghtFile";
             this.MaxLenghtFile.Size = new System.Drawing.Size(150, 20);
             this.MaxLenghtFile.TabIndex = 31;
+            this.MaxLenghtFile.Text = "16777216";
             this.MaxLenghtFile.TextChanged += new System.EventHandler(this.MaxLenghtFile_TextChanged);
             // 
             // label1
@@ -153,11 +155,23 @@
             this.label2.TabIndex = 38;
             this.label2.Text = "Serch File:";
             // 
+            // checkBoxByDir
+            // 
+            this.checkBoxByDir.AutoSize = true;
+            this.checkBoxByDir.Location = new System.Drawing.Point(324, 46);
+            this.checkBoxByDir.Name = "checkBoxByDir";
+            this.checkBoxByDir.Size = new System.Drawing.Size(54, 17);
+            this.checkBoxByDir.TabIndex = 39;
+            this.checkBoxByDir.Text = "By Dir";
+            this.checkBoxByDir.UseVisualStyleBackColor = true;
+            this.checkBoxByDir.CheckedChanged += new System.EventHandler(this.checkBoxByDir_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1330, 1049);
+            this.Controls.Add(this.checkBoxByDir);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dataGru);
             this.Controls.Add(this.checkFilesBox);
@@ -190,6 +204,7 @@
         private System.Windows.Forms.CheckBox checkFilesBox;
         private System.Windows.Forms.DataGridView dataGru;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox checkBoxByDir;
     }
 }
 

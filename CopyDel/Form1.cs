@@ -20,7 +20,6 @@ namespace CopyDel
         public Form1()
         {
             InitializeComponent();
-            MaxLenghtFile.Text = "16777216";
 
             textdir.Text = Dir;
             this.AllowDrop = true;
@@ -31,6 +30,7 @@ namespace CopyDel
             richTextBox1.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
 
             Load += MainForm_Load;
+            checkFilesBox.Checked = true;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -67,11 +67,14 @@ namespace CopyDel
                     int i = 0, j = 0;
                     for (i = 0; i < CheckFileList.Count() - 1; i++)
                     {
+                        if (CheckFileList[i].Copy > -1) continue;
                         string heshI = CheckFileList[i].Hesh;
                         long fileLength = CheckFileList[i].FileLength;
 
+
                         for (j = i + 1; j < CheckFileList.Count(); j++)
                         {
+                            if (CheckFileList[j].Copy > -1) continue;
                             if (fileLength != 0)
                             {
                                 if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
@@ -94,7 +97,7 @@ namespace CopyDel
                     var copyList = CheckFileList.Where(x => x.Copy != -1).OrderBy(y => y.Copy).ToList();
                     if (copyList.Count > 0)
                     {
-                        i = 0;
+                        i = -1;
                         int nDelFiles = 0;
                         foreach (var elem in copyList)
                         {
@@ -125,7 +128,8 @@ namespace CopyDel
                     }
 
                     RefreshDataGru(copyList);
-                    richTextBox1.Text = text += "\n\n" + copyList.Count + " kопий ";
+                    if(copyList.Count==0) richTextBox1.Text = text + "\n" + "Kопий Nет!";
+                    else richTextBox1.Text = text + "\n" + copyList.Count + " kопий ";
                 }
             }
         }
@@ -136,7 +140,7 @@ namespace CopyDel
             dataGru.DataSource = bind;
             dataGru.Columns["File"].Width = 750;
             dataGru.Columns["ForDel"].Width = 35;
-            dataGru.Columns["Hesh"].Width = 220;
+            dataGru.Columns["Hesh"].Width = 280;
             dataGru.Columns["Copy"].Width = 60;
             dataGru.Columns["FileLength"].Width = 60;
             if (!dataGru.Columns.Contains("Del"))
@@ -233,15 +237,49 @@ namespace CopyDel
         {
             if (File.Exists(file))
             {
-                File.Delete(file);
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    return file + " - !!!ERRRR!!!  - " + ex.Message + "\n";
+                }
+
                 if (!File.Exists(file))
                 {
-
                     dataGru.Rows.RemoveAt(rowIndex);
-                    return file + " deleted!\n";
+                    return file + " - deleted!\n";
                 }
             }
             return file + " deleted Err!!!\n";
+        }
+
+        private void checkBoxByDir_CheckedChanged(object sender, EventArgs e)
+        {
+            if(checkBoxByDir.Checked)
+            {
+                if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
+                {
+                    string txt = string.Empty;
+                    DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
+                    foreach (var Dir in Dires.GetDirectories())
+                    {
+                        var Files = Directory.GetFiles(Dir.FullName,"*.*", SearchOption.AllDirectories);
+                        long size = 0;
+                        foreach (var file in Files)size += new FileInfo(file).Length;
+                        txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
+                    }
+                    richTextBox1.Text = txt;
+                }
+
+                checkFilesBox.Checked = false;
+                checkFilesBox.Enabled = false;
+            }
+            else
+            {
+                checkFilesBox.Enabled = true;
+            }
         }
     }
 }

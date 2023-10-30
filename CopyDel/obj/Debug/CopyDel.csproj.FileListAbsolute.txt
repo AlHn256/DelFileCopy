@@ -46,10 +46,10 @@ C:\CSH\CopyDel\CopyDel\obj\Debug\CopyDel.pdb
 C:\CSH\CopyDel\DelFileCopy\CopyDel\bin\Debug\CopyDel.exe.config
 C:\CSH\CopyDel\DelFileCopy\CopyDel\bin\Debug\CopyDel.exe
 C:\CSH\CopyDel\DelFileCopy\CopyDel\bin\Debug\CopyDel.pdb
-C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.csprojAssemblyReference.cache
 C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.Form1.resources
 C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.Properties.Resources.resources
 C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.csproj.GenerateResource.cache
 C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.csproj.CoreCompileInputs.cache
 C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.exe
 C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.pdb
+C:\CSH\CopyDel\DelFileCopy\CopyDel\obj\Debug\CopyDel.csproj.AssemblyReference.cache
