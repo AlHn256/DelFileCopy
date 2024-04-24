@@ -5,11 +5,13 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 
+
 namespace CopyDel.Models
 {
     class FileEdit
     {
-        private string StrException;
+        public bool IsErr { get; set; } = false;
+        public string ErrText { get; set; }
 
         public string AutoLoade()
         {
@@ -32,6 +34,13 @@ namespace CopyDel.Models
                 }
             }
             return LoadeInfo;
+        }
+
+        private bool SetExeption(Exception e)
+        {
+            IsErr = true;
+            ErrText = e.Message;
+            return false;
         }
 
         public bool AutoSave(string[] Info)
@@ -164,8 +173,6 @@ namespace CopyDel.Models
         }
         private string[] GetAutoSaveFilesList()
         {
-
-            string test = AppDomain.CurrentDomain.BaseDirectory;
             string ApplicationFileName = Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName.Split('\\').Last()) + ".inf";
             string[] AutoSaveFiles = new string[] { @"C:\Windows\Temp", @"D:", @"E:", @"C:" };
 
@@ -271,6 +278,8 @@ namespace CopyDel.Models
             //-1 Jist DirL1 1
             //-2 Jist DirL1 2
 
+            if (string.IsNullOrEmpty(dir)) dir = AppDomain.CurrentDomain.BaseDirectory;
+
             FileInfo[] fileList = new FileInfo[] { };
 
             if (Directory.Exists(dir))
@@ -283,7 +292,21 @@ namespace CopyDel.Models
             return fileList;
         }
 
-        public string GetExeption() { return StrException; }
-        public void SetExeption(Exception e) { StrException = e.Message.ToString(); }
+        public string GetDefoltDirectory() => AppDomain.CurrentDomain.BaseDirectory;
+
+        public bool DelAllFileFromDir(string rezultDir)
+        {
+            bool rezult = true;
+            var fileList = SearchFiles(rezultDir);
+            if (fileList != null)
+            {
+                foreach (var f in fileList)
+                {
+                    File.Delete(f.FullName);
+                    if (File.Exists(f.FullName)) rezult = false;
+                }
+            }
+            return rezult;
+        }
     }
 }

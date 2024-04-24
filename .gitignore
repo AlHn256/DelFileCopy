@@ -54,3 +54,5 @@ dkms.conf
 *.cache
 /CopyDel/obj
 /CopyDel/bin
+/CopyDel/bin
+/CopyDel/obj

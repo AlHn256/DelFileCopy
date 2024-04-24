@@ -7,133 +7,147 @@ using CopyDel.Models;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Drawing;
+using CopyDel.NewForms;
 
 namespace CopyDel
 {
     public partial class Form1 : Form
     {
-        string Dir = @"E:\Test";
-        List<CopyList> CheckFileList;
+        //private string Dir 
+        private List<string> AdditionalSourceList = new List<string>();
+        private List<CopyList> CheckFileList = new List<CopyList>();
         private object _context;
         private FileList fileList;
+        private bool serchInDirectory = true;
 
         public Form1()
         {
             InitializeComponent();
 
-            textdir.Text = Dir;
+            textdir.Text = @"E:\Test";
             this.AllowDrop = true;
-            richTextBox1.AllowDrop = true;
             this.DragEnter += new DragEventHandler(WindowsForm_DragEnter);
             this.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
-            richTextBox1.DragEnter += new DragEventHandler(WindowsForm_DragEnter);
-            richTextBox1.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
 
-            Load += MainForm_Load;
             checkFilesBox.Checked = true;
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
             _context = SynchronizationContext.Current;
         }
-
-        private async void FindCopy(bool Del)
+        private async void FindCopy(bool Del = false)
         {
-            if(dataGru.RowCount>0 && Del)
+            if (dataGru.RowCount > 0 && Del)
             {
-                for(int i= dataGru.RowCount-1; i>-1 ; i--)
+                for (int i = dataGru.RowCount - 1; i > -1; i--)
                 {
-                    bool ForDel = (bool)dataGru["ForDel", i].Value;
-                    if(ForDel) richTextBox1.Text += DelFile(dataGru["File", i].Value.ToString(), i);
+                    if ((bool)dataGru["ForDel", i].Value) RTB.Text += DelFile(dataGru["File", i].Value.ToString(), i);
                 }
             }
             else
             {
-                CheckFileList = new List<CopyList>();
-                if (Directory.Exists(Dir))
+                string text = string.Empty;
+                CheckFileList.Clear();
+
+
+
+
+
+                //if (AditionalOptionsChkBox.Checked) AdditionalSourceList
+
+
+
+
+
+
+                if (string.IsNullOrEmpty(textdir.Text))
                 {
-                    long maxLenghtFile = 0;
-                    long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-                    fileList = new FileList(Dir, maxLenghtFile, checkFilesBox.Checked);
-                    fileList.ProcessChanged += worker_ProcessChanged;
-
-                    string text = string.Empty;
-                    richTextBox1.Text += "Start search" + "\nDir - " + Dir;
-                    await Task.Run(() => { fileList.MadeList(_context); });
-                    CheckFileList = fileList.GetList();
-                    richTextBox1.Text += "\nFinish " + CheckFileList.Count();
-
-                    int i = 0, j = 0;
-                    for (i = 0; i < CheckFileList.Count() - 1; i++)
-                    {
-                        if (CheckFileList[i].Copy > -1) continue;
-                        string heshI = CheckFileList[i].Hesh;
-                        long fileLength = CheckFileList[i].FileLength;
-
-
-                        for (j = i + 1; j < CheckFileList.Count(); j++)
-                        {
-                            if (CheckFileList[j].Copy > -1) continue;
-                            if (fileLength != 0)
-                            {
-                                if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
-                                {
-                                    CheckFileList[i].Copy = i;
-                                    CheckFileList[j].Copy = i;
-                                }
-                            }
-                            else
-                            {
-                                if (CheckFileList[j].Copy == -1 && heshI == CheckFileList[j].Hesh)
-                                {
-                                    CheckFileList[i].Copy = i;
-                                    CheckFileList[j].Copy = i;
-                                }
-                            }
-                        }
-                    }
-
-                    var copyList = CheckFileList.Where(x => x.Copy != -1).OrderBy(y => y.Copy).ToList();
-                    if (copyList.Count > 0)
-                    {
-                        i = -1;
-                        int nDelFiles = 0;
-                        foreach (var elem in copyList)
-                        {
-                            if (i == elem.Copy)
-                            {
-                                elem.ForDel = true;
-                                if (Del)
-                                {
-                                    File.Delete(elem.File);
-                                    if (!File.Exists(elem.File)) nDelFiles++;
-                                    if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  - DELETED by HeshCOPY";
-                                    else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  - DELETED by LengthCOPY";
-                                }
-                                else
-                                {
-                                    if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
-                                    else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY FOR DELETE";
-                                }
-                            }
-                            else
-                            {
-                                if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
-                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY";
-                            }
-                            i = elem.Copy;
-                        }
-                        if (nDelFiles > 0) text += "\n" + nDelFiles + " Deleted Files!!!";
-                    }
-
-                    RefreshDataGru(copyList);
-                    if(copyList.Count==0) richTextBox1.Text = text + "\n" + "Kопий Nет!";
-                    else richTextBox1.Text = text + "\n" + copyList.Count + " kопий ";
+                    RTB.Text = "Err Textdir IsNullOrEmpty!!!";
+                    return;
                 }
+
+                if (!Directory.Exists(textdir.Text))
+                {
+                    RTB.Text = "Err Dir "+ textdir.Text + " не найдена!!!";
+                    return;
+                }
+
+                long maxLenghtFile = 0;
+                long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
+                fileList = new FileList(textdir.Text, maxLenghtFile, checkFilesBox.Checked);
+                fileList.ProcessChanged += worker_ProcessChanged;
+
+                
+                RTB.Text += "Start search" + "\nDir - " + textdir.Text;
+                await Task.Run(() => { fileList.MadeList(_context); });
+                CheckFileList = fileList.GetList();
+                RTB.Text += "\nFinish " + CheckFileList.Count();
+
+                int i = 0, j = 0;
+                for (i = 0; i < CheckFileList.Count() - 1; i++)
+                {
+                    if (CheckFileList[i].Copy > -1) continue;
+                    string heshI = CheckFileList[i].Hesh;
+                    long fileLength = CheckFileList[i].FileLength;
+
+
+                    for (j = i + 1; j < CheckFileList.Count(); j++)
+                    {
+                        if (CheckFileList[j].Copy > -1) continue;
+                        if (fileLength != 0)
+                        {
+                            if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
+                            {
+                                CheckFileList[i].Copy = i;
+                                CheckFileList[j].Copy = i;
+                            }
+                        }
+                        else
+                        {
+                            if (CheckFileList[j].Copy == -1 && heshI == CheckFileList[j].Hesh)
+                            {
+                                CheckFileList[i].Copy = i;
+                                CheckFileList[j].Copy = i;
+                            }
+                        }
+                    }
+                }
+
+                var copyList = CheckFileList.Where(x => x.Copy != -1).OrderBy(y => y.Copy).ToList();
+                if (copyList.Count > 0)
+                {
+                    i = -1;
+                    int nDelFiles = 0;
+                    foreach (var elem in copyList)
+                    {
+                        if (i == elem.Copy)
+                        {
+                            elem.ForDel = true;
+                            if (Del)
+                            {
+                                File.Delete(elem.File);
+                                if (!File.Exists(elem.File)) nDelFiles++;
+                                if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  - DELETED by HeshCOPY";
+                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  - DELETED by LengthCOPY";
+                            }
+                            else
+                            {
+                                if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
+                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY FOR DELETE";
+                            }
+                        }
+                        else
+                        {
+                            if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
+                            else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY";
+                        }
+                        i = elem.Copy;
+                    }
+                    if (nDelFiles > 0) text += "\n" + nDelFiles + " Deleted Files!!!";
+                }
+
+                RefreshDataGru(copyList);
+                if (copyList.Count == 0) RTB.Text = text + "\n" + "Kопий Nет!";
+                else RTB.Text = text + "\n" + copyList.Count + " kопий ";
             }
         }
-
         private void RefreshDataGru(List<CopyList> copyList)
         {
             BindingSource bind = new BindingSource { DataSource = copyList };
@@ -169,25 +183,47 @@ namespace CopyDel
             }
 
             foreach (DataGridViewRow row in dataGru.Rows)
-                if ((bool)row.Cells["ForDel"].Value)
-                {
-                    row.DefaultCellStyle.BackColor = Color.DimGray;
-                }
+                if ((bool)row.Cells["ForDel"].Value)row.DefaultCellStyle.BackColor = Color.DimGray;
         }
 
-        private void test_Click(object sender, EventArgs e) { FindCopy(true); }
-        private void button1_Click(object sender, EventArgs e) { FindCopy(false); }
         void WindowsForm_DragEnter(object sender, DragEventArgs e) { if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy; }
         void WindowsForm_DragDrop(object sender, DragEventArgs e)
         {
-            richTextBox1.Text = "";
+            RTB.Text = "";
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (string file in files)
+            if (files.Length > 1)
             {
-                FileAttributes attr = File.GetAttributes(file);
-                if ((attr & FileAttributes.Directory) == FileAttributes.Directory) textdir.Text = file;
-                else textdir.Text = Path.GetDirectoryName(file);
-                Dir = textdir.Text;
+                serchInDirectory = false;
+                List<DirInfo> dirInfoList = new List<DirInfo>();
+                string text = string.Empty;
+                foreach (var file in files)
+                {
+                    long size =  new FileInfo(file).Length;
+                    dirInfoList.Add(new DirInfo
+                    {
+                        Name = file,
+                        TextSize = size > 1048576 ? (size / 1048576).ToString() + " Mb" : size + " Kb"
+                    });
+                    text += file + "\n";
+                }
+
+                RTB.Text = text;
+                BindingSource bind = new BindingSource { DataSource = dirInfoList };
+                dataGru.DataSource = bind;
+
+                dataGru.Columns["Name"].Width = 750;
+                dataGru.Columns["Size"].Visible = false;
+                dataGru.Columns["FileNumber"].Visible = false;
+            }
+            else
+            {
+                serchInDirectory = true;
+                foreach (string file in files)
+                {
+                    FileAttributes attr = File.GetAttributes(file);
+                    if ((attr & FileAttributes.Directory) == FileAttributes.Directory) textdir.Text = file;
+                    else textdir.Text = Path.GetDirectoryName(file);
+                }
             }
         }
 
@@ -213,16 +249,14 @@ namespace CopyDel
 
         private void DataGru_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (!serchInDirectory) return;
             if (e.RowIndex > -1)
             {
                 string file = dataGru["File", e.RowIndex].Value.ToString();
                 string dir = Path.GetDirectoryName(file);
                 var asd = dataGru.Columns[e.ColumnIndex].Name;
-                if (dataGru.Columns[e.ColumnIndex].Name == "Del")
-                {
-                    richTextBox1.Text += DelFile(file, e.RowIndex);
+                if (dataGru.Columns[e.ColumnIndex].Name == "Del") RTB.Text += DelFile(file, e.RowIndex);
 
-                }
                 if (dataGru.Columns[e.ColumnIndex].Name == "Dir")
                 {
                     var proc = new System.Diagnostics.Process();
@@ -232,7 +266,6 @@ namespace CopyDel
                 }
             }
         }
-
         private string DelFile(string file, int rowIndex)
         {
             if (File.Exists(file))
@@ -255,31 +288,71 @@ namespace CopyDel
             return file + " deleted Err!!!\n";
         }
 
-        private void checkBoxByDir_CheckedChanged(object sender, EventArgs e)
+        private void CountFilesInDirBtn_Click(object sender, EventArgs e)
         {
-            if(checkBoxByDir.Checked)
+            if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
             {
-                if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
+                List<DirInfo> dirInfoList = new List<DirInfo>();
+                DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
+                foreach (var Dir in Dires.GetDirectories())
                 {
-                    string txt = string.Empty;
-                    DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
-                    foreach (var Dir in Dires.GetDirectories())
-                    {
-                        var Files = Directory.GetFiles(Dir.FullName,"*.*", SearchOption.AllDirectories);
-                        long size = 0;
-                        foreach (var file in Files)size += new FileInfo(file).Length;
-                        txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
-                    }
-                    richTextBox1.Text = txt;
-                }
+                    var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
+                    long size = Files.Select(x => new FileInfo(x).Length).Sum();
 
-                checkFilesBox.Checked = false;
-                checkFilesBox.Enabled = false;
+                    dirInfoList.Add(new DirInfo
+                    {
+                        Name = Dir.FullName,
+                        FileNumber = Files.Count(),
+                        Size = size,
+                        TextSize = size > 1048576 ? (size/ 1048576).ToString() + " Mb" : size + " Kb"
+                    });
+                }
+                BindingSource bind = new BindingSource { DataSource = dirInfoList };
+                dataGru.DataSource = bind;
+
+                dataGru.Columns["Name"].Width = 750;
+                dataGru.Columns["Size"].Visible = false;
             }
             else
             {
-                checkFilesBox.Enabled = true;
+                if (Directory.Exists(textdir.Text)) RTB.Text = "Err: Файл " + textdir.Text + "не найден!!!";
+                if (string.IsNullOrEmpty(textdir.Text)) RTB.Text = "Err: string.IsNullOrEmpty(textdir.Text)!!!";
             }
+        }
+
+        private void AditionalOptionsChkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if(AditionalOptionsChkBox.Checked)
+            {
+                AdditionalSource additionalSource = new AdditionalSource();
+                additionalSource.ShowDialog();
+                if (additionalSource.IsOk)
+                {
+                    List <AdditionalSource.FileInformation> AdditionalSourceList = additionalSource.FileInfoList;
+                }
+                else AdditionalSourceList.Clear();
+            }
+            else AdditionalSourceList.Clear();
+        }
+
+        private void DelCopyBtn_Click(object sender, EventArgs e)=> FindCopy(true);
+        private void ShowCopyBtn_Click(object sender, EventArgs e) => FindCopy();
+        private void DirInfoBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
+            {
+                string txt = string.Empty;
+                DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
+                foreach (var Dir in Dires.GetDirectories())
+                {
+                    var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
+                    long size = 0;
+                    foreach (var file in Files) size += new FileInfo(file).Length;
+                    txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
+                }
+                RTB.Text = txt;
+            }
+            else RTB.Text = "Err такой папки не ообнаруженно!!!\n" + textdir.Text;
         }
     }
 }

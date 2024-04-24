@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.test = new System.Windows.Forms.Button();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.DelCopyBtn = new System.Windows.Forms.Button();
+            this.RTB = new System.Windows.Forms.RichTextBox();
             this.textdir = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.ShowCopyBtn = new System.Windows.Forms.Button();
             this.MaxLenghtFile = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
@@ -39,33 +39,35 @@
             this.checkFilesBox = new System.Windows.Forms.CheckBox();
             this.dataGru = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
-            this.checkBoxByDir = new System.Windows.Forms.CheckBox();
+            this.CountFilesInDirBtn = new System.Windows.Forms.Button();
+            this.AditionalOptionsChkBox = new System.Windows.Forms.CheckBox();
+            this.DirInfoBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGru)).BeginInit();
             this.SuspendLayout();
             // 
-            // test
+            // DelCopyBtn
             // 
-            this.test.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.DelCopyBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.test.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.test.Location = new System.Drawing.Point(12, 100);
-            this.test.Name = "test";
-            this.test.Size = new System.Drawing.Size(1306, 32);
-            this.test.TabIndex = 27;
-            this.test.Text = "Del Copy";
-            this.test.UseVisualStyleBackColor = true;
-            this.test.Click += new System.EventHandler(this.test_Click);
+            this.DelCopyBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.DelCopyBtn.Location = new System.Drawing.Point(12, 100);
+            this.DelCopyBtn.Name = "DelCopyBtn";
+            this.DelCopyBtn.Size = new System.Drawing.Size(1306, 32);
+            this.DelCopyBtn.TabIndex = 27;
+            this.DelCopyBtn.Text = "Del Copy";
+            this.DelCopyBtn.UseVisualStyleBackColor = true;
+            this.DelCopyBtn.Click += new System.EventHandler(this.DelCopyBtn_Click);
             // 
-            // richTextBox1
+            // RTB
             // 
-            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.RTB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox1.Location = new System.Drawing.Point(12, 818);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(1306, 219);
-            this.richTextBox1.TabIndex = 28;
-            this.richTextBox1.Text = "";
+            this.RTB.Location = new System.Drawing.Point(12, 818);
+            this.RTB.Name = "RTB";
+            this.RTB.Size = new System.Drawing.Size(1306, 219);
+            this.RTB.TabIndex = 28;
+            this.RTB.Text = "";
             // 
             // textdir
             // 
@@ -73,18 +75,18 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textdir.Location = new System.Drawing.Point(100, 17);
             this.textdir.Name = "textdir";
-            this.textdir.Size = new System.Drawing.Size(1218, 20);
+            this.textdir.Size = new System.Drawing.Size(1115, 20);
             this.textdir.TabIndex = 29;
             // 
-            // button1
+            // ShowCopyBtn
             // 
-            this.button1.Location = new System.Drawing.Point(12, 71);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(82, 23);
-            this.button1.TabIndex = 30;
-            this.button1.Text = "Show Copy";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.ShowCopyBtn.Location = new System.Drawing.Point(12, 71);
+            this.ShowCopyBtn.Name = "ShowCopyBtn";
+            this.ShowCopyBtn.Size = new System.Drawing.Size(82, 23);
+            this.ShowCopyBtn.TabIndex = 30;
+            this.ShowCopyBtn.Text = "Show Copy";
+            this.ShowCopyBtn.UseVisualStyleBackColor = true;
+            this.ShowCopyBtn.Click += new System.EventHandler(this.ShowCopyBtn_Click);
             // 
             // MaxLenghtFile
             // 
@@ -136,8 +138,7 @@
             // 
             // dataGru
             // 
-            this.dataGru.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.dataGru.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGru.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGru.Location = new System.Drawing.Point(12, 138);
@@ -155,23 +156,46 @@
             this.label2.TabIndex = 38;
             this.label2.Text = "Serch File:";
             // 
-            // checkBoxByDir
+            // CountFilesInDirBtn
             // 
-            this.checkBoxByDir.AutoSize = true;
-            this.checkBoxByDir.Location = new System.Drawing.Point(324, 46);
-            this.checkBoxByDir.Name = "checkBoxByDir";
-            this.checkBoxByDir.Size = new System.Drawing.Size(54, 17);
-            this.checkBoxByDir.TabIndex = 39;
-            this.checkBoxByDir.Text = "By Dir";
-            this.checkBoxByDir.UseVisualStyleBackColor = true;
-            this.checkBoxByDir.CheckedChanged += new System.EventHandler(this.checkBoxByDir_CheckedChanged);
+            this.CountFilesInDirBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CountFilesInDirBtn.Location = new System.Drawing.Point(1221, 15);
+            this.CountFilesInDirBtn.Name = "CountFilesInDirBtn";
+            this.CountFilesInDirBtn.Size = new System.Drawing.Size(97, 23);
+            this.CountFilesInDirBtn.TabIndex = 40;
+            this.CountFilesInDirBtn.Text = "Count Files In Dir";
+            this.CountFilesInDirBtn.UseVisualStyleBackColor = true;
+            this.CountFilesInDirBtn.Click += new System.EventHandler(this.CountFilesInDirBtn_Click);
+            // 
+            // AditionalOptionsChkBox
+            // 
+            this.AditionalOptionsChkBox.AutoSize = true;
+            this.AditionalOptionsChkBox.Location = new System.Drawing.Point(334, 46);
+            this.AditionalOptionsChkBox.Name = "AditionalOptionsChkBox";
+            this.AditionalOptionsChkBox.Size = new System.Drawing.Size(105, 17);
+            this.AditionalOptionsChkBox.TabIndex = 41;
+            this.AditionalOptionsChkBox.Text = "Aditional Options";
+            this.AditionalOptionsChkBox.UseVisualStyleBackColor = true;
+            this.AditionalOptionsChkBox.CheckedChanged += new System.EventHandler(this.AditionalOptionsChkBox_CheckedChanged);
+            // 
+            // DirInfoBtn
+            // 
+            this.DirInfoBtn.Location = new System.Drawing.Point(462, 42);
+            this.DirInfoBtn.Name = "DirInfoBtn";
+            this.DirInfoBtn.Size = new System.Drawing.Size(82, 23);
+            this.DirInfoBtn.TabIndex = 42;
+            this.DirInfoBtn.Text = "Dir Info";
+            this.DirInfoBtn.UseVisualStyleBackColor = true;
+            this.DirInfoBtn.Click += new System.EventHandler(this.DirInfoBtn_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1330, 1049);
-            this.Controls.Add(this.checkBoxByDir);
+            this.Controls.Add(this.DirInfoBtn);
+            this.Controls.Add(this.AditionalOptionsChkBox);
+            this.Controls.Add(this.CountFilesInDirBtn);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dataGru);
             this.Controls.Add(this.checkFilesBox);
@@ -179,10 +203,10 @@
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.MaxLenghtFile);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.ShowCopyBtn);
             this.Controls.Add(this.textdir);
-            this.Controls.Add(this.richTextBox1);
-            this.Controls.Add(this.test);
+            this.Controls.Add(this.RTB);
+            this.Controls.Add(this.DelCopyBtn);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGru)).EndInit();
@@ -193,10 +217,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Button test;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Button DelCopyBtn;
+        private System.Windows.Forms.RichTextBox RTB;
         private System.Windows.Forms.TextBox textdir;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button ShowCopyBtn;
         private System.Windows.Forms.TextBox MaxLenghtFile;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ProgressBar progressBar1;
@@ -204,7 +228,9 @@
         private System.Windows.Forms.CheckBox checkFilesBox;
         private System.Windows.Forms.DataGridView dataGru;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox checkBoxByDir;
+        private System.Windows.Forms.Button CountFilesInDirBtn;
+        private System.Windows.Forms.CheckBox AditionalOptionsChkBox;
+        private System.Windows.Forms.Button DirInfoBtn;
     }
 }
 
