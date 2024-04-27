@@ -89,7 +89,7 @@ namespace CopyDel
                 {
                     if (CheckFileList[i].Copy > -1) continue;
                     string heshI = CheckFileList[i].Hesh;
-                    long fileLength = CheckFileList[i].FileLength;
+                    long fileLength = CheckFileList[i].Size;
 
 
                     for (j = i + 1; j < CheckFileList.Count(); j++)
@@ -97,7 +97,7 @@ namespace CopyDel
                         if (CheckFileList[j].Copy > -1) continue;
                         if (fileLength != 0)
                         {
-                            if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].FileLength)
+                            if (CheckFileList[j].Copy == -1 && fileLength == CheckFileList[j].Size)
                             {
                                 CheckFileList[i].Copy = i;
                                 CheckFileList[j].Copy = i;
@@ -128,19 +128,19 @@ namespace CopyDel
                             {
                                 File.Delete(elem.File);
                                 if (!File.Exists(elem.File)) nDelFiles++;
-                                if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  - DELETED by HeshCOPY";
-                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  - DELETED by LengthCOPY";
+                                if (elem.Size == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  - DELETED by HeshCOPY";
+                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Size + "  - DELETED by LengthCOPY";
                             }
                             else
                             {
-                                if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
-                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY FOR DELETE";
+                                if (elem.Size == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY FOR DELETE";
+                                else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Size + "  -  LengthCOPY FOR DELETE";
                             }
                         }
                         else
                         {
-                            if (elem.FileLength == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
-                            else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.FileLength + "  -  LengthCOPY";
+                            if (elem.Size == 0) text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Hesh + "  -  HeshCOPY";
+                            else text += "\n" + i + " " + elem.Copy + " " + elem.File + " " + elem.Size + "  -  LengthCOPY";
                         }
                         i = elem.Copy;
                     }
@@ -160,7 +160,7 @@ namespace CopyDel
             dataGru.Columns["ForDel"].Width = 35;
             dataGru.Columns["Hesh"].Width = 280;
             dataGru.Columns["Copy"].Width = 60;
-            dataGru.Columns["FileLength"].Width = 60;
+            dataGru.Columns["Size"].Width = 60;
             if (!dataGru.Columns.Contains("Del"))
             {
                 DataGridViewButtonColumn DelButtonColumn = new DataGridViewButtonColumn();

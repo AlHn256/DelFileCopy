@@ -75,7 +75,7 @@ namespace CopyDel.NewForms
             AditionalSourceDataGrid.DataSource = FileList;
             AditionalSourceDataGrid.Columns["File"].Width = 500;
             AditionalSourceDataGrid.Columns["ForDel"].Visible = false;
-            AditionalSourceDataGrid.Columns["Hesh"].Width = 280;
+            AditionalSourceDataGrid.Columns["Hesh"].Width = 50;
             AditionalSourceDataGrid.Columns["Copy"].Visible = false;
             AditionalSourceDataGrid.Columns["Size"].Width = 60;
             AditionalSourceDataGrid.Columns["IsVirtual"].Width = 60;
@@ -91,12 +91,9 @@ namespace CopyDel.NewForms
                 DelButtonColumn.Width = 30;
                 AditionalSourceDataGrid.Columns.Add(DelButtonColumn);
             }
-
-            var size = FileList.Sum(x => x.FileLength) / 1048576;
+            var size = FileList.Sum(x => x.Size) / 1048576;
             FileInfoLab.Text = FileList.Count.ToString() + " files  " + Math.Round((double)size, 2) +" Mb";
         }
-
-
 
         //private void RefreshAditionalSourceDataGrid(List<CopyList> copyList)
         //{
