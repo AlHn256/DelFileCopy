@@ -11,7 +11,7 @@ namespace CopyDel.NewForms
     {
         public bool IsOk = false;
         FileEdit fileEdit = new FileEdit();
-        public List<FileInformation> FileInfoList = new List<FileInformation>();
+        public List<CopyList> FileList = new List<CopyList>();
         public AdditionalSource()
         {
             InitializeComponent();
@@ -24,90 +24,126 @@ namespace CopyDel.NewForms
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
 
-        public class FileInformation
-        {
-            public string Name { get; set; }
-            public string FullName { get; set; }
-            public double Size { get; set; }
-            public bool IsSelected { get; set; }
-            public bool IsVirtual { get; set; }
-        }
-
         void WindowsForm_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            //AdditionalSourceList.Clear();
             foreach (var file in files)
             {
-                string test = file;
+                //string test = file;
                 FileAttributes attr = File.GetAttributes(file);
-                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                string rsh = Path.GetExtension(file);
+
+                if (rsh == ".rafl" || rsh == ".vafl")
+                {
+                    bool isVirtual = rsh == ".vafl" ? true : false;
+
+                    var FileList = fileEdit.GetFileList(file);
+                    if (FileList.Count != 0)
+                        foreach (var elem in FileList) AddFile(elem, isVirtual);
+                }
+                else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
                     FileInfo[] fileInf = fileEdit.SearchFiles(file);
-                    foreach (FileInfo fileInfo in fileInf)
-                        FileInfoList.Add(new FileInformation()
-                        {
-                            FullName = fileInfo.FullName,
-                            Name = fileInfo.Name,
-                            Size = fileInfo.Length,
-                            IsSelected = false
-                        });
+                    foreach (FileInfo fileInfo in fileInf) AddFile(fileInfo);
                 }
-                else
-                {
-                    var fileInfo = new FileInfo(file);
-                    FileInfoList.Add(new FileInformation()
-                    { 
-                        FullName = fileInfo.FullName,
-                        Name = fileInfo.Name,
-                        Size = fileInfo.Length,
-                        IsSelected = false
-                    });
-                }
-                    
+                else AddFile(file);
             }
-            AditionalSourceDataGrid.DataSource = null;
-            AditionalSourceDataGrid.DataSource = FileInfoList;
+            
             RenewInfo();
+        }
+
+        private void AddFile(string file)=>AddFile(new FileInfo(file));
+        private void AddFile(string file, bool isVirtual)
+        {
+            if (isVirtual) { }
+            else AddFile(file);
+        }
+        private void AddFile(FileInfo fileInfo)
+        {
+            if (!FileList.Any(x => x.File == fileInfo.FullName)&& fileInfo.Exists)
+                FileList.Add(new CopyList(fileInfo.FullName, fileInfo.Length));
         }
         private void OkBtn_Click(object sender, EventArgs e)
         {
             IsOk = true;
             Close();
         }
-
-        private void CancelBtn_Click(object sender, EventArgs e)=>Close();
-
-        // Переименование файлов в обратном направлении
-        //private void TestBtn_Click(object sender, EventArgs e)
-        //{
-
-        //    string Dir = "D:\\Work\\Exampels\\20";
-        //    var files = fileEdit.SearchFiles(Dir);
-
-        //    files = files.OrderByDescending(x=>x.Name).ToArray();
-
-        //    if (files.Length > 0)
-        //    {
-        //        for (int i = 0;i< files.Length; i++)
-        //        {
-        //            string file = i<10? "00" + i + ".bmp":  "0" +i+".bmp";
-        //            string newfilename = Dir +"\\"+ file;
-        //            File.Move(files[i].FullName, newfilename);
-        //        }
-        //    }
-        //}
-
+        private void CancelBtn_Click(object sender, EventArgs e) => Close();
         private void RenewInfo()
         {
-            var size = FileInfoList.Sum(x => x.Size)/ 1048576;
-            FileInfoLab.Text = FileInfoList.Count.ToString() + " files  " + Math.Round(size, 2) +" Mb";
+            AditionalSourceDataGrid.DataSource = null;
+            AditionalSourceDataGrid.DataSource = FileList;
+            AditionalSourceDataGrid.Columns["File"].Width = 500;
+            AditionalSourceDataGrid.Columns["ForDel"].Visible = false;
+            AditionalSourceDataGrid.Columns["Hesh"].Width = 280;
+            AditionalSourceDataGrid.Columns["Copy"].Visible = false;
+            AditionalSourceDataGrid.Columns["Size"].Width = 60;
+            AditionalSourceDataGrid.Columns["IsVirtual"].Width = 60;
+            if (!AditionalSourceDataGrid.Columns.Contains("del"))
+            {
+                DataGridViewButtonColumn DelButtonColumn = new DataGridViewButtonColumn();
+                DelButtonColumn.Visible = true;
+                DelButtonColumn.Text = "del";
+                DelButtonColumn.Name = "del";
+                DelButtonColumn.HeaderText = "del";
+                DelButtonColumn.FlatStyle = FlatStyle.Popup;
+                //DelButtonColumn.Usecolumntextforbuttonvalue = true;
+                DelButtonColumn.Width = 30;
+                AditionalSourceDataGrid.Columns.Add(DelButtonColumn);
+            }
+
+            var size = FileList.Sum(x => x.FileLength) / 1048576;
+            FileInfoLab.Text = FileList.Count.ToString() + " files  " + Math.Round((double)size, 2) +" Mb";
         }
+
+
+
+        //private void RefreshAditionalSourceDataGrid(List<CopyList> copyList)
+        //{
+        //    BindingSource bind = new BindingSource { DataSource = copyList };
+        //    AditionalSourceDataGrid.DataSource = bind;
+        //    AditionalSourceDataGrid.Columns["File"].Width = 750;
+        //    AditionalSourceDataGrid.Columns["ForDel"].Width = 35;
+        //    AditionalSourceDataGrid.Columns["Hesh"].Width = 280;
+        //    AditionalSourceDataGrid.Columns["Copy"].Width = 60;
+        //    AditionalSourceDataGrid.Columns["FileLength"].Width = 60;
+        //    if (!AditionalSourceDataGrid.Columns.Contains("Del"))
+        //    {
+        //        DataGridViewButtonColumn DelButtonColumn = new DataGridViewButtonColumn();
+        //        DelButtonColumn.Visible = true;
+        //        DelButtonColumn.Text = "Del";
+        //        DelButtonColumn.Name = "Del";
+        //        DelButtonColumn.HeaderText = "Del";
+        //        DelButtonColumn.FlatStyle = FlatStyle.Popup;
+        //        DelButtonColumn.UseColumnTextForButtonValue = true;
+        //        DelButtonColumn.Width = 30;
+        //        AditionalSourceDataGrid.Columns.Add(DelButtonColumn);
+        //    }
+        //    if (!AditionalSourceDataGrid.Columns.Contains("Dir"))
+        //    {
+        //        DataGridViewButtonColumn DirButtonColumn = new DataGridViewButtonColumn();
+        //        DirButtonColumn.Visible = true;
+        //        DirButtonColumn.Text = "Dir";
+        //        DirButtonColumn.Name = "Dir";
+        //        DirButtonColumn.HeaderText = "Dir";
+        //        DirButtonColumn.FlatStyle = FlatStyle.Popup;
+        //        DirButtonColumn.UseColumnTextForButtonValue = true;
+        //        DirButtonColumn.Width = 30;
+        //        AditionalSourceDataGrid.Columns.Add(DirButtonColumn);
+        //    }
+
+        //    foreach (DataGridViewRow row in AditionalSourceDataGrid.Rows)
+        //        if ((bool)row.Cells["ForDel"].Value) row.DefaultCellStyle.BackColor = Color.DimGray;
+        //}
+
+
+
+
+
+
         private void DelAllBtn_Click(object sender, EventArgs e)
         {
-            FileInfoList.Clear();
-            AditionalSourceDataGrid.DataSource = null;
-            AditionalSourceDataGrid.DataSource = FileInfoList;
+            FileList.Clear();
             RenewInfo();
         }
     }

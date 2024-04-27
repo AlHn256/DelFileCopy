@@ -14,7 +14,7 @@ namespace CopyDel
     public partial class Form1 : Form
     {
         //private string Dir 
-        private List<string> AdditionalSourceList = new List<string>();
+        private List<CopyList> AdditionalCopyList = new List<CopyList>();
         private List<CopyList> CheckFileList = new List<CopyList>();
         private object _context;
         private FileList fileList;
@@ -50,7 +50,11 @@ namespace CopyDel
 
 
 
-                //if (AditionalOptionsChkBox.Checked) AdditionalSourceList
+                if (AditionalOptionsChkBox.Checked && AdditionalCopyList.Count > 0)
+                {
+
+
+                }
 
 
 
@@ -328,14 +332,14 @@ namespace CopyDel
                 additionalSource.ShowDialog();
                 if (additionalSource.IsOk)
                 {
-                    List <AdditionalSource.FileInformation> AdditionalSourceList = additionalSource.FileInfoList;
+                    AdditionalCopyList = additionalSource.FileList;
                 }
-                else AdditionalSourceList.Clear();
+                else AdditionalCopyList.Clear();
             }
-            else AdditionalSourceList.Clear();
+            else AdditionalCopyList.Clear();
         }
 
-        private void DelCopyBtn_Click(object sender, EventArgs e)=> FindCopy(true);
+        private void DelCopyBtn_Click(object sender, EventArgs e) => FindCopy(true);
         private void ShowCopyBtn_Click(object sender, EventArgs e) => FindCopy();
         private void DirInfoBtn_Click(object sender, EventArgs e)
         {
