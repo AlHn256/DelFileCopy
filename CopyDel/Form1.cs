@@ -46,43 +46,42 @@ namespace CopyDel
                 string text = string.Empty;
                 CheckFileList.Clear();
 
-
-
-
-
-                if (AditionalOptionsChkBox.Checked && AdditionalCopyList.Count > 0)
-                {
-
-
-                }
-
-
-
-
-
-
                 if (string.IsNullOrEmpty(textdir.Text))
                 {
                     RTB.Text = "Err Textdir IsNullOrEmpty!!!";
                     return;
                 }
 
-                if (!Directory.Exists(textdir.Text))
+
+                if (!Directory.Exists(textdir.Text) && !AditionalOptionsChkBox.Checked)
                 {
                     RTB.Text = "Err Dir "+ textdir.Text + " не найдена!!!";
                     return;
                 }
 
-                long maxLenghtFile = 0;
-                long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-                fileList = new FileList(textdir.Text, maxLenghtFile, checkFilesBox.Checked);
-                fileList.ProcessChanged += worker_ProcessChanged;
+                if (Directory.Exists(textdir.Text))
+                {
+                    long maxLenghtFile = 0;
+                    long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
+                    fileList = new FileList(textdir.Text, maxLenghtFile, checkFilesBox.Checked);
+                    fileList.ProcessChanged += worker_ProcessChanged;
 
-                
-                RTB.Text += "Start search" + "\nDir - " + textdir.Text;
-                await Task.Run(() => { fileList.MadeList(_context); });
-                CheckFileList = fileList.GetList();
-                RTB.Text += "\nFinish " + CheckFileList.Count();
+                    RTB.Text += "Start search" + "\nDir - " + textdir.Text;
+                    await Task.Run(() => { fileList.MadeList(_context); });
+                    CheckFileList = fileList.GetList();
+                    RTB.Text += "\nFinish " + CheckFileList.Count();
+                }
+
+
+                if (AditionalOptionsChkBox.Checked && AdditionalCopyList.Count > 0)
+                {
+
+                    if (CheckFileList.Count > 0)
+                    {
+                        //CheckFileList = Merg(CheckFileList, AdditionalCopyList);
+                    }
+                    else CheckFileList = AdditionalCopyList;
+                }
 
                 int i = 0, j = 0;
                 for (i = 0; i < CheckFileList.Count() - 1; i++)
