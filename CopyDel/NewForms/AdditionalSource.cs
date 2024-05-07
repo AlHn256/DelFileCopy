@@ -71,6 +71,7 @@ namespace CopyDel.NewForms
         private void CancelBtn_Click(object sender, EventArgs e) => Close();
         private void RenewInfo()
         {
+            FileList = FileList.OrderByDescending(x => x.Size).ToList();
             AditionalSourceDataGrid.DataSource = null;
             AditionalSourceDataGrid.DataSource = FileList;
             AditionalSourceDataGrid.Columns["File"].Width = 500;
@@ -132,11 +133,6 @@ namespace CopyDel.NewForms
         //    foreach (DataGridViewRow row in AditionalSourceDataGrid.Rows)
         //        if ((bool)row.Cells["ForDel"].Value) row.DefaultCellStyle.BackColor = Color.DimGray;
         //}
-
-
-
-
-
 
         private void DelAllBtn_Click(object sender, EventArgs e)
         {

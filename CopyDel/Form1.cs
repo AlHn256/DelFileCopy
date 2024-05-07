@@ -24,7 +24,7 @@ namespace CopyDel
         {
             InitializeComponent();
 
-            textdir.Text = @"E:\Test";
+            textdir.Text = @"D:\KN";
             this.AllowDrop = true;
             this.DragEnter += new DragEventHandler(WindowsForm_DragEnter);
             this.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
@@ -66,20 +66,15 @@ namespace CopyDel
                     fileList = new FileList(textdir.Text, maxLenghtFile, checkFilesBox.Checked);
                     fileList.ProcessChanged += worker_ProcessChanged;
 
-                    RTB.Text += "Start search" + "\nDir - " + textdir.Text;
+                    RTB.Text = "Start search" + "\nDir - " + textdir.Text;
                     await Task.Run(() => { fileList.MadeList(_context); });
                     CheckFileList = fileList.GetList();
                     RTB.Text += "\nFinish " + CheckFileList.Count();
                 }
 
-
                 if (AditionalOptionsChkBox.Checked && AdditionalCopyList.Count > 0)
                 {
-
-                    if (CheckFileList.Count > 0)
-                    {
-                        //CheckFileList = Merg(CheckFileList, AdditionalCopyList);
-                    }
+                    if (CheckFileList.Count > 0)   Merg();
                     else CheckFileList = AdditionalCopyList;
                 }
 
@@ -89,7 +84,6 @@ namespace CopyDel
                     if (CheckFileList[i].Copy > -1) continue;
                     string heshI = CheckFileList[i].Hesh;
                     long fileLength = CheckFileList[i].Size;
-
 
                     for (j = i + 1; j < CheckFileList.Count(); j++)
                     {
@@ -151,6 +145,61 @@ namespace CopyDel
                 else RTB.Text = text + "\n" + copyList.Count + " kопий ";
             }
         }
+
+        private void Merg()
+        {
+            long maxLenghtFile = 0;
+            long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
+            FileEdit fileEdit = new FileEdit();
+            foreach (CopyList additionalList in AdditionalCopyList)
+            {
+                
+                if (!CheckFileList.Any(a => a.File == additionalList.File))
+                {
+
+                    if(additionalList.Size < maxLenghtFile)
+                    {
+                        additionalList.Size = 0;
+                        FileInfo file = new FileInfo(additionalList.File);
+                        if (file.FullName == "D:\\Development\\3.avi")
+                        {
+
+                        }
+                        else
+                        {
+
+                            if (!fileEdit.IsFileLocked(file)) additionalList.Hesh = fileEdit.ComputeMD5Checksum(additionalList.File);
+                            else
+                            {
+                                string fl = file.FullName;
+                            }
+                        }
+                    }
+
+
+                    //FileInfo fileInf = new FileInfo(additionalList.File);
+                    //if (maxLenghtFile == 0)
+                    //{
+                    //    string md5 = fileEdit.ComputeMD5Checksum(additionalList.File);
+                    //    CheckFileList.Add(new CopyList(additionalList.File, md5, fileInf.Length));
+                    //}
+                    //else
+                    //{
+                    //    if (fileInf.Length < maxLenghtFile)
+                    //    {
+                    //        string md5 = fileEdit.ComputeMD5Checksum(additionalList.File);
+                    //        CheckFileList.Add(new CopyList(additionalList.File, md5));
+                    //    }
+                    //    else CheckFileList.Add(new CopyList(additionalList.File, "", fileInf.Length));
+                    //}
+
+
+
+                    CheckFileList.Add(additionalList);
+                }
+            }
+        }
+
         private void RefreshDataGru(List<CopyList> copyList)
         {
             BindingSource bind = new BindingSource { DataSource = copyList };
