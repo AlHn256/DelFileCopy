@@ -41,7 +41,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.CountFilesInDirBtn = new System.Windows.Forms.Button();
             this.AditionalOptionsChkBox = new System.Windows.Forms.CheckBox();
-            this.DirInfoBtn = new System.Windows.Forms.Button();
+            this.TestBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGru)).BeginInit();
             this.SuspendLayout();
             // 
@@ -75,7 +75,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textdir.Location = new System.Drawing.Point(100, 17);
             this.textdir.Name = "textdir";
-            this.textdir.Size = new System.Drawing.Size(1115, 20);
+            this.textdir.Size = new System.Drawing.Size(1218, 20);
             this.textdir.TabIndex = 29;
             // 
             // ShowCopyBtn
@@ -159,11 +159,11 @@
             // CountFilesInDirBtn
             // 
             this.CountFilesInDirBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CountFilesInDirBtn.Location = new System.Drawing.Point(1221, 15);
+            this.CountFilesInDirBtn.Location = new System.Drawing.Point(453, 42);
             this.CountFilesInDirBtn.Name = "CountFilesInDirBtn";
             this.CountFilesInDirBtn.Size = new System.Drawing.Size(97, 23);
             this.CountFilesInDirBtn.TabIndex = 40;
-            this.CountFilesInDirBtn.Text = "Count Files In Dir";
+            this.CountFilesInDirBtn.Text = "Dir Info";
             this.CountFilesInDirBtn.UseVisualStyleBackColor = true;
             this.CountFilesInDirBtn.Click += new System.EventHandler(this.CountFilesInDirBtn_Click);
             // 
@@ -178,22 +178,23 @@
             this.AditionalOptionsChkBox.UseVisualStyleBackColor = true;
             this.AditionalOptionsChkBox.CheckedChanged += new System.EventHandler(this.AditionalOptionsChkBox_CheckedChanged);
             // 
-            // DirInfoBtn
+            // TestBtn
             // 
-            this.DirInfoBtn.Location = new System.Drawing.Point(462, 42);
-            this.DirInfoBtn.Name = "DirInfoBtn";
-            this.DirInfoBtn.Size = new System.Drawing.Size(82, 23);
-            this.DirInfoBtn.TabIndex = 42;
-            this.DirInfoBtn.Text = "Dir Info";
-            this.DirInfoBtn.UseVisualStyleBackColor = true;
-            this.DirInfoBtn.Click += new System.EventHandler(this.DirInfoBtn_Click);
+            this.TestBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.TestBtn.Location = new System.Drawing.Point(556, 42);
+            this.TestBtn.Name = "TestBtn";
+            this.TestBtn.Size = new System.Drawing.Size(97, 23);
+            this.TestBtn.TabIndex = 42;
+            this.TestBtn.Text = "Test ";
+            this.TestBtn.UseVisualStyleBackColor = true;
+            this.TestBtn.Click += new System.EventHandler(this.TestBtn_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1330, 1049);
-            this.Controls.Add(this.DirInfoBtn);
+            this.Controls.Add(this.TestBtn);
             this.Controls.Add(this.AditionalOptionsChkBox);
             this.Controls.Add(this.CountFilesInDirBtn);
             this.Controls.Add(this.label2);
@@ -230,7 +231,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button CountFilesInDirBtn;
         private System.Windows.Forms.CheckBox AditionalOptionsChkBox;
-        private System.Windows.Forms.Button DirInfoBtn;
+        private System.Windows.Forms.Button TestBtn;
     }
 }
 

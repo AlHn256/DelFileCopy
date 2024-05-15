@@ -14,11 +14,13 @@ namespace CopyDel
     public partial class Form1 : Form
     {
         //private string Dir 
+        private System.Security.Principal.WindowsIdentity _principal;
         private List<CopyList> AdditionalCopyList = new List<CopyList>();
         private List<CopyList> CheckFileList = new List<CopyList>();
         private object _context;
         private FileList fileList;
         private bool serchInDirectory = true;
+        private bool DataGruDirectoryMode = false;
 
         public Form1()
         {
@@ -234,6 +236,7 @@ namespace CopyDel
                 dataGru.Columns.Add(DirButtonColumn);
             }
 
+            DataGruDirectoryMode = false;
             foreach (DataGridViewRow row in dataGru.Rows)
                 if ((bool)row.Cells["ForDel"].Value)row.DefaultCellStyle.BackColor = Color.DimGray;
         }
@@ -262,7 +265,7 @@ namespace CopyDel
                 RTB.Text = text;
                 BindingSource bind = new BindingSource { DataSource = dirInfoList };
                 dataGru.DataSource = bind;
-
+                DataGruDirectoryMode = false;
                 dataGru.Columns["Name"].Width = 750;
                 dataGru.Columns["Size"].Visible = false;
                 dataGru.Columns["FileNumber"].Visible = false;
@@ -302,7 +305,7 @@ namespace CopyDel
         private void DataGru_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (!serchInDirectory) return;
-            if (e.RowIndex > -1)
+            if (e.RowIndex > -1 && !DataGruDirectoryMode)
             {
                 string file = dataGru["File", e.RowIndex].Value.ToString();
                 string dir = Path.GetDirectoryName(file);
@@ -340,37 +343,6 @@ namespace CopyDel
             return file + " deleted Err!!!\n";
         }
 
-        private void CountFilesInDirBtn_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
-            {
-                List<DirInfo> dirInfoList = new List<DirInfo>();
-                DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
-                foreach (var Dir in Dires.GetDirectories())
-                {
-                    var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
-                    long size = Files.Select(x => new FileInfo(x).Length).Sum();
-
-                    dirInfoList.Add(new DirInfo
-                    {
-                        Name = Dir.FullName,
-                        FileNumber = Files.Count(),
-                        Size = size,
-                        TextSize = size > 1048576 ? (size/ 1048576).ToString() + " Mb" : size + " Kb"
-                    });
-                }
-                BindingSource bind = new BindingSource { DataSource = dirInfoList };
-                dataGru.DataSource = bind;
-
-                dataGru.Columns["Name"].Width = 750;
-                dataGru.Columns["Size"].Visible = false;
-            }
-            else
-            {
-                if (Directory.Exists(textdir.Text)) RTB.Text = "Err: Файл " + textdir.Text + "не найден!!!";
-                if (string.IsNullOrEmpty(textdir.Text)) RTB.Text = "Err: string.IsNullOrEmpty(textdir.Text)!!!";
-            }
-        }
 
         private void AditionalOptionsChkBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -389,22 +361,132 @@ namespace CopyDel
 
         private void DelCopyBtn_Click(object sender, EventArgs e) => FindCopy(true);
         private void ShowCopyBtn_Click(object sender, EventArgs e) => FindCopy();
-        private void DirInfoBtn_Click(object sender, EventArgs e)
+        //private void DirInfoBtn_Click(object sender, EventArgs e)
+        //{
+        //    if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
+        //    {
+        //        string txt = string.Empty;
+        //        List< DirInfo > dirInfoList = new List< DirInfo >();
+        //        DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
+        //        foreach (var Dir in Dires.GetDirectories())
+        //        {
+        //            var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
+        //            long size = Files.Select(x => new FileInfo(x).Length).Sum();
+
+        //            dirInfoList.Add(new DirInfo
+        //            {
+        //                Name = Dir.FullName,
+        //                FileNumber = Files.Count(),
+        //                Size = size,
+        //                TextSize = size > 1048576 ? (size / 1048576).ToString() + " Mb" : size + " Kb"
+        //            });
+        //            txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
+        //        }
+        //        dirInfoList = dirInfoList.OrderByDescending(x => x.Size).ToList();
+        //        dataGru.DataSource = null;
+        //        BindingSource bind = new BindingSource { DataSource = dirInfoList };
+        //        dataGru.DataSource = bind;
+        //        DataGruDirectoryMode = true;
+
+        //        RTB.Text = txt;
+        //    }
+        //    else RTB.Text = "Err такой папки не ообнаруженно!!!\n" + textdir.Text;
+        //}
+        private void CountFilesInDirBtn_Click(object sender, EventArgs e)
         {
+            FileEdit fileEdit = new FileEdit();
             if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
             {
                 string txt = string.Empty;
+                List<DirInfo> dirInfoList = new List<DirInfo>();
                 DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
                 foreach (var Dir in Dires.GetDirectories())
                 {
-                    var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
-                    long size = 0;
-                    foreach (var file in Files) size += new FileInfo(file).Length;
-                    txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
+                    if(Dir.FullName == @"D:\$RECYCLE.BIN")
+                    {
+
+                    }
+                    if (fileEdit.CheckAccessToFolder(Dir.FullName) && Dir.FullName != @"D:\$RECYCLE.BIN" && Dir.FullName != @"D:\Development")
+                    {
+                        // ?? Перед этим нужно проверить все папки на доступ
+                        var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
+                        long size = Files.Select(x => new FileInfo(x).Length).Sum();
+
+                        dirInfoList.Add(new DirInfo
+                        {
+                            Name = Dir.FullName,
+                            FileNumber = Files.Count(),
+                            Size = size,
+                            TextSize = size > 1048576 ? (size / 1048576).ToString() + " Mb" : size + " Kb"
+                        });
+                        txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
+                    }
+                    else
+                    {
+                        dirInfoList.Add(new DirInfo
+                        {
+                            Name = Dir.FullName,
+                            AccessInfo = "К папке нет доступа!"
+                        });
+                        txt += Dir.FullName + "К папке нет доступа!\n";
+                    }
+                    // ?? TODO CheckAcsess befor...
+
                 }
+
+                dirInfoList = dirInfoList.OrderByDescending(x => x.Size).ToList();
+                BindingSource bind = new BindingSource { DataSource = dirInfoList };
+                dataGru.DataSource = bind;
+                DataGruDirectoryMode = true;
+                dataGru.Columns["Name"].Width = 750;
+                dataGru.Columns["Size"].Visible = false;
                 RTB.Text = txt;
             }
-            else RTB.Text = "Err такой папки не ообнаруженно!!!\n" + textdir.Text;
+            else
+            {
+                if (Directory.Exists(textdir.Text)) RTB.Text = "Err: Файл " + textdir.Text + "не найден!!!";
+                if (string.IsNullOrEmpty(textdir.Text)) RTB.Text = "Err: string.IsNullOrEmpty(textdir.Text)!!!";
+            }
         }
+
+        void CheckBox()
+        {
+            string dir = @"D:\$RECYCLE.BIN\S-1-5-21-934136088-583011989-1724144-1283";
+            dir = @"D:\Work\Exampels\22Mn";
+            FileEdit fileEdit = new FileEdit();
+            var gsdf= fileEdit.CheckAccessToFolder(dir);
+        }
+
+        void CheckBox2()
+        {
+            string dir = @"D:\Development\3.avi";
+            dir = @"D:\Work\Exampels\22Mn\004.bmp";
+            FileEdit fileEdit = new FileEdit();
+            var gsdf = fileEdit.CheckAccessToFile(dir);
+        }
+
+        private void TestBtn_Click(object sender, EventArgs e)
+        {
+            CheckBox();
+        }
+        //void CheckBox2()
+        //{
+        //    AuthorizationRuleCollection asd= new AuthorizationRuleCollection();
+
+        //    AuthorizationRuleCollection acl =  fileSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+        //    bool denyEdit = false;
+        //    for (int x = 0; x < acl.Count; x++)
+        //    {
+        //        FileSystemAccessRule currentRule = (FileSystemAccessRule)acl[x];
+        //        AccessControlType accessType = currentRule.AccessControlType;
+        //        //Copy file cannot be executed for "List Folder/Read Data" and "Read extended attributes" denied permission
+        //        if (accessType == AccessControlType.Deny && (currentRule.FileSystemRights & FileSystemRights.ListDirectory) == FileSystemRights.ListDirectory)
+        //        {
+        //            //we have deny copy - we can't copy the file
+        //            denyEdit = true;
+        //            break;
+        //        }
+        //    }
+        //}
     }
 }
