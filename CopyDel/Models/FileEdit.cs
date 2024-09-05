@@ -248,7 +248,7 @@ namespace CopyDel.Models
         {
             try
             {
-                FileStream fs = new FileStream(file, FileMode.Truncate, FileAccess.Write, FileShare.Read);
+                FileStream fs = new FileStream(file, FileMode.OpenOrCreate);
                 using (StreamWriter writetext = new StreamWriter(fs))
                 {
                     writetext.WriteLine(text);

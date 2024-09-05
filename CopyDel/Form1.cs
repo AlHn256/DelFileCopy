@@ -14,11 +14,12 @@ namespace CopyDel
     public partial class Form1 : Form
     {
         //private string Dir 
-        private System.Security.Principal.WindowsIdentity _principal;
+        //private System.Security.Principal.WindowsIdentity _principal;
         private List<CopyList> AdditionalCopyList = new List<CopyList>();
         private List<CopyList> CheckFileList = new List<CopyList>();
         private object _context;
         private FileList fileList;
+        FileEdit fileEdit = new FileEdit();
         private bool serchInDirectory = true;
         private bool DataGruDirectoryMode = false;
 
@@ -38,10 +39,12 @@ namespace CopyDel
         {
             if (dataGru.RowCount > 0 && Del)
             {
+                string txt = string.Empty;
                 for (int i = dataGru.RowCount - 1; i > -1; i--)
                 {
                     if ((bool)dataGru["ForDel", i].Value) RTB.Text += DelFile(dataGru["File", i].Value.ToString(), i);
                 }
+                RTB.Text += txt;
             }
             else
             {
@@ -152,13 +155,11 @@ namespace CopyDel
         {
             long maxLenghtFile = 0;
             long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-            FileEdit fileEdit = new FileEdit();
+            
             foreach (CopyList additionalList in AdditionalCopyList)
             {
-                
                 if (!CheckFileList.Any(a => a.File == additionalList.File))
                 {
-
                     if(additionalList.Size < maxLenghtFile)
                     {
                         additionalList.Size = 0;
@@ -169,7 +170,6 @@ namespace CopyDel
                         }
                         else
                         {
-
                             if (!fileEdit.IsFileLocked(file)) additionalList.Hesh = fileEdit.ComputeMD5Checksum(additionalList.File);
                             else
                             {
@@ -177,7 +177,6 @@ namespace CopyDel
                             }
                         }
                     }
-
 
                     //FileInfo fileInf = new FileInfo(additionalList.File);
                     //if (maxLenghtFile == 0)
@@ -194,8 +193,6 @@ namespace CopyDel
                     //    }
                     //    else CheckFileList.Add(new CopyList(additionalList.File, "", fileInf.Length));
                     //}
-
-
 
                     CheckFileList.Add(additionalList);
                 }
@@ -281,7 +278,6 @@ namespace CopyDel
                 }
             }
         }
-
         private void MaxLenghtFile_TextChanged(object sender, EventArgs e)
         {
             long Long = 0;
@@ -394,7 +390,6 @@ namespace CopyDel
         //}
         private void CountFilesInDirBtn_Click(object sender, EventArgs e)
         {
-            FileEdit fileEdit = new FileEdit();
             if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
             {
                 string txt = string.Empty;
@@ -431,7 +426,6 @@ namespace CopyDel
                         txt += Dir.FullName + "К папке нет доступа!\n";
                     }
                     // ?? TODO CheckAcsess befor...
-
                 }
 
                 dirInfoList = dirInfoList.OrderByDescending(x => x.Size).ToList();
@@ -449,19 +443,61 @@ namespace CopyDel
             }
         }
 
+        class FileInf
+        {
+            public int Id { get; set; }
+            public string File { get; set; }
+            public string FileName { get; set; }
+            public string FullName { get; set; }
+        }
+
         void CheckBox()
         {
-            string dir = @"D:\$RECYCLE.BIN\S-1-5-21-934136088-583011989-1724144-1283";
-            dir = @"D:\Work\Exampels\22Mn";
-            FileEdit fileEdit = new FileEdit();
-            var gsdf= fileEdit.CheckAccessToFolder(dir);
+            //string dir = @"D:\$RECYCLE.BIN\S-1-5-21-934136088-583011989-1724144-1283";
+            //dir = @"D:\Work\Exampels\22Mn";
+            //var gsdf= fileEdit.CheckAccessToFolder(dir);
+
+            int id = 0;
+            if(AdditionalCopyList.Count!=0)
+            {
+                var FileInfList = (from x in AdditionalCopyList
+                           where x.File.IndexOf(".frames") != -1
+                           select new FileInf()
+                           {
+                               Id = id++,
+                               FullName = x.File,
+                               FileName = Path.GetFileName(x.File),
+                               File = Path.GetFileNameWithoutExtension(x.File)
+                           }).ToList();
+
+
+                int y = 0;
+                string Insert = string.Empty;
+                foreach (var elem in FileInfList)
+                {
+                    if(int.TryParse(elem.File, out y)) elem.Id = y; 
+                    else elem.Id = elem.Id * 1000 + 999;
+                    Insert += "(" + elem.Id + ",'" + elem.File + "','" + elem.FileName + "','" + elem.FullName + "'),\n";
+                }
+                
+                string saveText = string.Empty;
+                AdditionalCopyList.Select(x =>saveText += x.File +"\n").ToArray();
+                string saveFile = fileEdit.GetDefoltDirectory() + "files.txt";
+                if(fileEdit.SetFileString(saveFile, saveText)) RTB.Text = AdditionalCopyList.Count + " files saved to \n" + saveFile;
+                else RTB.Text = fileEdit.ErrText+"\nFile to save " + saveFile;
+
+                saveFile = fileEdit.GetDefoltDirectory() + "files2.txt";
+
+                if (fileEdit.SetFileString(saveFile, Insert)) RTB.Text += "\nSql query \n" + saveFile;
+                else RTB.Text += fileEdit.ErrText;
+            }
         }
 
         void CheckBox2()
         {
             string dir = @"D:\Development\3.avi";
             dir = @"D:\Work\Exampels\22Mn\004.bmp";
-            FileEdit fileEdit = new FileEdit();
+            
             var gsdf = fileEdit.CheckAccessToFile(dir);
         }
 
@@ -469,24 +505,5 @@ namespace CopyDel
         {
             CheckBox();
         }
-        //void CheckBox2()
-        //{
-        //    AuthorizationRuleCollection asd= new AuthorizationRuleCollection();
-
-        //    AuthorizationRuleCollection acl =  fileSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
-        //    bool denyEdit = false;
-        //    for (int x = 0; x < acl.Count; x++)
-        //    {
-        //        FileSystemAccessRule currentRule = (FileSystemAccessRule)acl[x];
-        //        AccessControlType accessType = currentRule.AccessControlType;
-        //        //Copy file cannot be executed for "List Folder/Read Data" and "Read extended attributes" denied permission
-        //        if (accessType == AccessControlType.Deny && (currentRule.FileSystemRights & FileSystemRights.ListDirectory) == FileSystemRights.ListDirectory)
-        //        {
-        //            //we have deny copy - we can't copy the file
-        //            denyEdit = true;
-        //            break;
-        //        }
-        //    }
-        //}
     }
 }

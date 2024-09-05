@@ -29,6 +29,15 @@ namespace CopyDel.Models
         {
             SynchronizationContext context = (SynchronizationContext)param;
 
+            // Пора переезжать на NetCore
+            //string[] dirs = Directory.GetFiles(Dir, "*.jpg",
+            //    new EnumerationOptions
+            //    {
+            //        IgnoreInaccessible = true,
+            //        RecurseSubdirectories = true
+            //    }
+            //);
+
             string[] dirs = Directory.GetFiles(Dir, "*.*", serrchOption);
             int dirsLength = dirs.Length;
             if (dirsLength != 0)
