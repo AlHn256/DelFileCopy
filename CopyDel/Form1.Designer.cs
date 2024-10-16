@@ -42,6 +42,7 @@
             this.CountFilesInDirBtn = new System.Windows.Forms.Button();
             this.AditionalOptionsChkBox = new System.Windows.Forms.CheckBox();
             this.TestBtn = new System.Windows.Forms.Button();
+            this.RshChkBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGru)).BeginInit();
             this.SuspendLayout();
             // 
@@ -159,7 +160,7 @@
             // CountFilesInDirBtn
             // 
             this.CountFilesInDirBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CountFilesInDirBtn.Location = new System.Drawing.Point(453, 42);
+            this.CountFilesInDirBtn.Location = new System.Drawing.Point(539, 42);
             this.CountFilesInDirBtn.Name = "CountFilesInDirBtn";
             this.CountFilesInDirBtn.Size = new System.Drawing.Size(97, 23);
             this.CountFilesInDirBtn.TabIndex = 40;
@@ -181,7 +182,7 @@
             // TestBtn
             // 
             this.TestBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.TestBtn.Location = new System.Drawing.Point(556, 42);
+            this.TestBtn.Location = new System.Drawing.Point(642, 42);
             this.TestBtn.Name = "TestBtn";
             this.TestBtn.Size = new System.Drawing.Size(97, 23);
             this.TestBtn.TabIndex = 42;
@@ -189,11 +190,23 @@
             this.TestBtn.UseVisualStyleBackColor = true;
             this.TestBtn.Click += new System.EventHandler(this.TestBtn_Click);
             // 
+            // RshChkBox
+            // 
+            this.RshChkBox.AutoSize = true;
+            this.RshChkBox.Location = new System.Drawing.Point(445, 46);
+            this.RshChkBox.Name = "RshChkBox";
+            this.RshChkBox.Size = new System.Drawing.Size(70, 17);
+            this.RshChkBox.TabIndex = 43;
+            this.RshChkBox.Text = "Rsh Filter";
+            this.RshChkBox.UseVisualStyleBackColor = true;
+            this.RshChkBox.CheckedChanged += new System.EventHandler(this.RshChkBox_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1330, 1049);
+            this.Controls.Add(this.RshChkBox);
             this.Controls.Add(this.TestBtn);
             this.Controls.Add(this.AditionalOptionsChkBox);
             this.Controls.Add(this.CountFilesInDirBtn);
@@ -232,6 +245,7 @@
         private System.Windows.Forms.Button CountFilesInDirBtn;
         private System.Windows.Forms.CheckBox AditionalOptionsChkBox;
         private System.Windows.Forms.Button TestBtn;
+        private System.Windows.Forms.CheckBox RshChkBox;
     }
 }
 

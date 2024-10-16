@@ -280,11 +280,10 @@ namespace CopyDel.Models
             if (string.IsNullOrEmpty(dir)) dir = AppDomain.CurrentDomain.BaseDirectory;
 
             FileInfo[] fileList = new FileInfo[] { };
-
             if (Directory.Exists(dir))
-            {
+            {//"*.aspx"
                 DirectoryInfo DI = new DirectoryInfo(dir);
-
+                //var sdf = DI.GetFiles("*.*",SearchOption.AllDirectories);
                 if (Lv == 0) fileList = filter.SelectMany(fi => DI.GetFiles(fi, SearchOption.AllDirectories)).Distinct().ToArray();
                 else fileList = filter.SelectMany(fi => DI.GetFiles(fi, SearchOption.TopDirectoryOnly)).Distinct().ToArray();
             }

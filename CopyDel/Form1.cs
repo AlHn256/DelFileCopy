@@ -22,6 +22,8 @@ namespace CopyDel
         FileEdit fileEdit = new FileEdit();
         private bool serchInDirectory = true;
         private bool DataGruDirectoryMode = false;
+        private string[] FileFilter = new string[1]{"*.*"};
+
 
         public Form1()
         {
@@ -68,13 +70,18 @@ namespace CopyDel
                 {
                     long maxLenghtFile = 0;
                     long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-                    fileList = new FileList(textdir.Text, maxLenghtFile, checkFilesBox.Checked);
-                    fileList.ProcessChanged += worker_ProcessChanged;
 
+                    //string[] fileFilter = new string[0]{ };
+                    //string[] fileFilter = new string[2] { "*.aspx", "*.cs" };
+                    //if (fileFilter.Count() == 0) 
+                    //if(RshChkBox.Checked && fileFilter.Count()>0) fileList = new FileList(textdir.Text, maxLenghtFile, FileFilter);
+                    //else fileList = new FileList(textdir.Text, maxLenghtFile, new string[1] { "*.*" });
+                    fileList = new FileList(textdir.Text, maxLenghtFile, FileFilter);
+                    fileList.ProcessChanged += worker_ProcessChanged;
                     RTB.Text = "Start search" + "\nDir - " + textdir.Text;
-                    await Task.Run(() => { fileList.MadeList(_context); });
-                    CheckFileList = fileList.GetList();
-                    RTB.Text += "\nFinish " + CheckFileList.Count();
+                    await Task.Run(() => { CheckFileList = fileList.MadeList(_context); });
+                    //CheckFileList = fileList.GetList();
+                    RTB.Text += "\nFinish \nНайдено: " + CheckFileList.Count();
                 }
 
                 if (AditionalOptionsChkBox.Checked && AdditionalCopyList.Count > 0)
@@ -150,7 +157,6 @@ namespace CopyDel
                 else RTB.Text = text + "\n" + copyList.Count + " kопий ";
             }
         }
-
         private void Merg()
         {
             long maxLenghtFile = 0;
@@ -339,7 +345,6 @@ namespace CopyDel
             return file + " deleted Err!!!\n";
         }
 
-
         private void AditionalOptionsChkBox_CheckedChanged(object sender, EventArgs e)
         {
             if(AditionalOptionsChkBox.Checked)
@@ -453,6 +458,10 @@ namespace CopyDel
 
         void CheckBox()
         {
+            string dir = @"D:\Development\Test\3.avi";
+            dir = @"D:\Development\3.avi";
+
+            //dir = @"D:\Work\Exampels\22Mn\004.bmp";
             //string dir = @"D:\$RECYCLE.BIN\S-1-5-21-934136088-583011989-1724144-1283";
             //dir = @"D:\Work\Exampels\22Mn";
             //var gsdf= fileEdit.CheckAccessToFolder(dir);
@@ -469,7 +478,6 @@ namespace CopyDel
                                FileName = Path.GetFileName(x.File),
                                File = Path.GetFileNameWithoutExtension(x.File)
                            }).ToList();
-
 
                 int y = 0;
                 string Insert = string.Empty;
@@ -495,15 +503,38 @@ namespace CopyDel
 
         void CheckBox2()
         {
-            string dir = @"D:\Development\3.avi";
-            dir = @"D:\Work\Exampels\22Mn\004.bmp";
-            
+            string dir = @"D:\Development\Test\3.avi";
+            dir = @"D:\Development\3.avi";
+
+            //dir = @"D:\Work\Exampels\22Mn\004.bmp";
+            //dir = @"D:\Work\Exampels\22Mn\004.bmp";
+
             var gsdf = fileEdit.CheckAccessToFile(dir);
         }
 
-        private void TestBtn_Click(object sender, EventArgs e)
+        private void TestBtn_Click(object sender, EventArgs e)=>CheckBox();
+
+        RshForm RshForm;
+      
+        private void RshChkBox_CheckedChanged(object sender, EventArgs e)
         {
-            CheckBox();
+            if (RshChkBox.Checked)
+            {
+
+                RshForm = new RshForm(FileFilter);
+                RshForm.ShowDialog();
+
+                if (RshForm.MFilter != null && RshForm.MFilter.Count() > 0 && RshForm.ApplyChanges)
+                {
+                    FileFilter = RshForm.MFilter;
+                    RTB.Text = "MFilter - ";
+                    foreach (var elem in FileFilter) RTB.Text += elem + " ";
+                }
+                else
+                {
+                    RshChkBox.Checked = false;
+                }
+            }
         }
     }
 }

@@ -54,12 +54,19 @@
     <Compile Include="Models\DirInfo.cs" />
     <Compile Include="Models\FileEdit.cs" />
     <Compile Include="Models\FileList.cs" />
+    <Compile Include="Models\RSHList.cs" />
     <Compile Include="Models\TextEdit.cs" />
     <Compile Include="NewForms\AdditionalSource.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="NewForms\AdditionalSource.Designer.cs">
       <DependentUpon>AdditionalSource.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewForms\RshForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewForms\RshForm.Designer.cs">
+      <DependentUpon>RshForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,6 +75,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NewForms\AdditionalSource.resx">
       <DependentUpon>AdditionalSource.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewForms\RshForm.resx">
+      <DependentUpon>RshForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
