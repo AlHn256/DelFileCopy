@@ -33,6 +33,7 @@
             this.CancelBtn = new System.Windows.Forms.Button();
             this.DelAllBtn = new System.Windows.Forms.Button();
             this.FileInfoLab = new System.Windows.Forms.Label();
+            this.FileFilterLb = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.AditionalSourceDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,11 +84,23 @@
             this.FileInfoLab.Size = new System.Drawing.Size(0, 18);
             this.FileInfoLab.TabIndex = 5;
             // 
+            // FileFilterLb
+            // 
+            this.FileFilterLb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.FileFilterLb.AutoSize = true;
+            this.FileFilterLb.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.FileFilterLb.Location = new System.Drawing.Point(165, 402);
+            this.FileFilterLb.Name = "FileFilterLb";
+            this.FileFilterLb.Size = new System.Drawing.Size(101, 15);
+            this.FileFilterLb.TabIndex = 6;
+            this.FileFilterLb.Text = "FileFilter is Off";
+            // 
             // AdditionalSource
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.FileFilterLb);
             this.Controls.Add(this.FileInfoLab);
             this.Controls.Add(this.DelAllBtn);
             this.Controls.Add(this.CancelBtn);
@@ -108,5 +121,6 @@
         private System.Windows.Forms.Button CancelBtn;
         private System.Windows.Forms.Button DelAllBtn;
         private System.Windows.Forms.Label FileInfoLab;
+        private System.Windows.Forms.Label FileFilterLb;
     }
 }

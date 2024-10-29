@@ -12,7 +12,6 @@ namespace CopyDel.Models
     {
         public bool IsErr { get; set; } = false;
         public string ErrText { get; set; }
-
         public string AutoLoade()
         {
             string LoadeInfo = string.Empty;
@@ -50,14 +49,12 @@ namespace CopyDel.Models
 
             string str = "";
             foreach (string txt in Info) str += txt + "\r";
-
             foreach (string FtoSave in FiletoSave)
             {
                 if (ChkFile(FtoSave)) SetFileString(FtoSave, str);
             }
             return false;
         }
-
         public bool ChkDir(string dir)
         {
             if (!Directory.Exists(dir))
@@ -142,7 +139,6 @@ namespace CopyDel.Models
             }
             return false;
         }
-
         internal bool IsSameDir(string DirFrom, string DirTo)
         {
             if (DirFrom != null && DirTo != null)
@@ -154,7 +150,6 @@ namespace CopyDel.Models
             }
             return false;
         }
-
         internal string GetAutoLoadeFirstFile()
         {
             string LoadeFile = "";
@@ -193,7 +188,6 @@ namespace CopyDel.Models
                 FileList = File.ReadAllLines(file).ToList();
             return FileList;
         }
-
         public List<string> GetFileList(string file, int nEncoding)
         {
             string encoding = "utf-8";
@@ -207,7 +201,6 @@ namespace CopyDel.Models
                 FileList = File.ReadAllLines(file, Encoding.GetEncoding(encoding)).ToList();
             return FileList;
         }
-
         public List<string> GetFileList(string file, string encoding)
         {
             if (encoding == null || encoding.Length == 0) return GetFileList(file);

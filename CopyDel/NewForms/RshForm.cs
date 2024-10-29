@@ -21,8 +21,6 @@ namespace CopyDel.NewForms
             new RSHList(){ Name = "Arhive", ShortName = "Rar", RSH = new string[] { "*.rar", "*.zip", "*.7z"}},
         };
 
-
-
         public RshForm(string[] mFilter)
         {
             InitializeComponent();

@@ -90,6 +90,7 @@
             // 
             // RshListComBox
             // 
+            this.RshListComBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.RshListComBox.FormattingEnabled = true;
             this.RshListComBox.Location = new System.Drawing.Point(18, 311);
             this.RshListComBox.Name = "RshListComBox";

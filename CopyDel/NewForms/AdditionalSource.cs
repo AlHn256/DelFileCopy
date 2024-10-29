@@ -10,54 +10,64 @@ namespace CopyDel.NewForms
     public partial class AdditionalSource : Form
     {
         public bool IsOk = false;
+        public string[] FileFilter = new string[1] { "*.*" };
         FileEdit fileEdit = new FileEdit();
         public List<CopyList> FileList = new List<CopyList>();
-        public AdditionalSource()
+        public AdditionalSource(string[] fileFilter)
         {
             InitializeComponent();
             this.AllowDrop = true;
             this.DragEnter += new DragEventHandler(WindowsForm_DragEnter);
             this.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
+
+            FileFilter = fileFilter;
+            if (FileFilter.Length > 1 || (FileFilter.Length == 1 && FileFilter[0] != "*.*"))
+            {
+                FileFilterLb.Text = "FileFilter is On:";
+                foreach (var item in FileFilter)FileFilterLb.Text += " " + item;
+            }
         }
         void WindowsForm_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
-
         void WindowsForm_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (var file in files)
             {
-                //string test = file;
                 FileAttributes attr = File.GetAttributes(file);
                 string rsh = Path.GetExtension(file);
 
-                if (rsh == ".rafl" || rsh == ".vafl")
+                //if (rsh == ".rafl" || rsh == ".vafl")
+                //{
+                //    bool isVirtual = rsh == ".vafl" ? true : false;
+                //    var FileList = fileEdit.GetFileList(file);
+                //    if (FileList.Count != 0)
+                //        foreach (var elem in FileList) AddFile(elem, isVirtual);
+                //}
+                //else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    bool isVirtual = rsh == ".vafl" ? true : false;
-
-                    var FileList = fileEdit.GetFileList(file);
-                    if (FileList.Count != 0)
-                        foreach (var elem in FileList) AddFile(elem, isVirtual);
+                    FileInfo[] fileInf = fileEdit.SearchFiles(file, FileFilter);
+                    foreach (FileInfo fileInfo in fileInf)
+                        FileList.Add(new CopyList(fileInfo.FullName, fileInfo.Length));
+                    //AddFile(fileInfo);
                 }
-                else if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                else
                 {
-                    FileInfo[] fileInf = fileEdit.SearchFiles(file);
-                    foreach (FileInfo fileInfo in fileInf) AddFile(fileInfo);
+                    FileInfo FileInf = new FileInfo(file);
+                    FileList.Add(new CopyList(FileInf.FullName, FileInf.Length));
                 }
-                else AddFile(file);
             }
-            
+            if (FileList.Count != 0)
+            {
+                FileList = FileList.OrderBy(x=>x.File).ToList();
+            }
+
             RenewInfo();
         }
-
-        private void AddFile(string file)=>AddFile(new FileInfo(file));
-        private void AddFile(string file, bool isVirtual)
-        {
-            if (isVirtual) { }
-            else AddFile(file);
-        }
+        private void AddFile(string file) => AddFile(new FileInfo(file));
         private void AddFile(FileInfo fileInfo)
         {
             if (!FileList.Any(x => x.File == fileInfo.FullName)&& fileInfo.Exists)
@@ -71,7 +81,7 @@ namespace CopyDel.NewForms
         private void CancelBtn_Click(object sender, EventArgs e) => Close();
         private void RenewInfo()
         {
-            FileList = FileList.OrderByDescending(x => x.Size).ToList();
+            //FileList = FileList.OrderByDescending(x => x.Size).ToList();
             AditionalSourceDataGrid.DataSource = null;
             AditionalSourceDataGrid.DataSource = FileList;
             AditionalSourceDataGrid.Columns["File"].Width = 500;
@@ -133,7 +143,6 @@ namespace CopyDel.NewForms
         //    foreach (DataGridViewRow row in AditionalSourceDataGrid.Rows)
         //        if ((bool)row.Cells["ForDel"].Value) row.DefaultCellStyle.BackColor = Color.DimGray;
         //}
-
         private void DelAllBtn_Click(object sender, EventArgs e)
         {
             FileList.Clear();

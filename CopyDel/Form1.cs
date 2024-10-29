@@ -24,7 +24,6 @@ namespace CopyDel
         private bool DataGruDirectoryMode = false;
         private string[] FileFilter = new string[1]{"*.*"};
 
-
         public Form1()
         {
             InitializeComponent();
@@ -59,7 +58,6 @@ namespace CopyDel
                     return;
                 }
 
-
                 if (!Directory.Exists(textdir.Text) && !AditionalOptionsChkBox.Checked)
                 {
                     RTB.Text = "Err Dir "+ textdir.Text + " не найдена!!!";
@@ -86,7 +84,7 @@ namespace CopyDel
 
                 if (AditionalOptionsChkBox.Checked && AdditionalCopyList.Count > 0)
                 {
-                    if (CheckFileList.Count > 0)   Merg();
+                    if (CheckFileList.Count > 0)Merg();
                     else CheckFileList = AdditionalCopyList;
                 }
 
@@ -96,7 +94,6 @@ namespace CopyDel
                     if (CheckFileList[i].Copy > -1) continue;
                     string heshI = CheckFileList[i].Hesh;
                     long fileLength = CheckFileList[i].Size;
-
                     for (j = i + 1; j < CheckFileList.Count(); j++)
                     {
                         if (CheckFileList[j].Copy > -1) continue;
@@ -243,7 +240,6 @@ namespace CopyDel
             foreach (DataGridViewRow row in dataGru.Rows)
                 if ((bool)row.Cells["ForDel"].Value)row.DefaultCellStyle.BackColor = Color.DimGray;
         }
-
         void WindowsForm_DragEnter(object sender, DragEventArgs e) { if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy; }
         void WindowsForm_DragDrop(object sender, DragEventArgs e)
         {
@@ -287,23 +283,16 @@ namespace CopyDel
         private void MaxLenghtFile_TextChanged(object sender, EventArgs e)
         {
             long Long = 0;
-
-            if (!long.TryParse(MaxLenghtFile.Text, out Long))
-            {
-                MaxLenghtFile.Text = "0";
-            }
+            if (!long.TryParse(MaxLenghtFile.Text, out Long))MaxLenghtFile.Text = "0";
         }
-
         private void worker_ProcessChanged(int progress)
         {
             progressBar1.Value = progress;
         }
-
         private void StopButton_Click(object sender, EventArgs e)
         {
             if(fileList!=null) fileList.Cansel(); 
         }
-
         private void DataGru_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (!serchInDirectory) return;
@@ -347,17 +336,25 @@ namespace CopyDel
 
         private void AditionalOptionsChkBox_CheckedChanged(object sender, EventArgs e)
         {
-            if(AditionalOptionsChkBox.Checked)
+            if (AditionalOptionsChkBox.Checked)
             {
-                AdditionalSource additionalSource = new AdditionalSource();
+                AdditionalSource additionalSource = new AdditionalSource(FileFilter);
+                additionalSource.Location = new Point(Location.X + 100, Location.Y + 100);
+                additionalSource.TopMost = true;
+                additionalSource.StartPosition = FormStartPosition.Manual;
                 additionalSource.ShowDialog();
-                if (additionalSource.IsOk)
+                if (additionalSource.IsOk) AdditionalCopyList = additionalSource.FileList;
+                else
                 {
-                    AdditionalCopyList = additionalSource.FileList;
+                    AdditionalCopyList.Clear();
+                    AditionalOptionsChkBox.Checked = false;
                 }
-                else AdditionalCopyList.Clear();
             }
-            else AdditionalCopyList.Clear();
+            else
+            {
+                AdditionalCopyList.Clear();
+                AditionalOptionsChkBox.Checked = false;
+            }
         }
 
         private void DelCopyBtn_Click(object sender, EventArgs e) => FindCopy(true);
@@ -447,7 +444,6 @@ namespace CopyDel
                 if (string.IsNullOrEmpty(textdir.Text)) RTB.Text = "Err: string.IsNullOrEmpty(textdir.Text)!!!";
             }
         }
-
         class FileInf
         {
             public int Id { get; set; }
@@ -455,7 +451,6 @@ namespace CopyDel
             public string FileName { get; set; }
             public string FullName { get; set; }
         }
-
         void CheckBox()
         {
             string dir = @"D:\Development\Test\3.avi";
@@ -515,13 +510,14 @@ namespace CopyDel
         private void TestBtn_Click(object sender, EventArgs e)=>CheckBox();
 
         RshForm RshForm;
-      
         private void RshChkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (RshChkBox.Checked)
             {
-
-                RshForm = new RshForm(FileFilter);
+                if(RshForm == null) RshForm = new RshForm(FileFilter);
+                RshForm.Location = new Point(Location.X + 100, Location.Y+100);
+                RshForm.TopMost = true;
+                RshForm.StartPosition = FormStartPosition.Manual;
                 RshForm.ShowDialog();
 
                 if (RshForm.MFilter != null && RshForm.MFilter.Count() > 0 && RshForm.ApplyChanges)
@@ -530,10 +526,7 @@ namespace CopyDel
                     RTB.Text = "MFilter - ";
                     foreach (var elem in FileFilter) RTB.Text += elem + " ";
                 }
-                else
-                {
-                    RshChkBox.Checked = false;
-                }
+                else RshChkBox.Checked = false;
             }
         }
     }
