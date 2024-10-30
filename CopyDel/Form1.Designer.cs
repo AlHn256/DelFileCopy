@@ -43,6 +43,7 @@
             this.AditionalOptionsChkBox = new System.Windows.Forms.CheckBox();
             this.TestBtn = new System.Windows.Forms.Button();
             this.RshChkBox = new System.Windows.Forms.CheckBox();
+            this.ExchangeChkBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGru)).BeginInit();
             this.SuspendLayout();
             // 
@@ -201,11 +202,23 @@
             this.RshChkBox.UseVisualStyleBackColor = true;
             this.RshChkBox.CheckedChanged += new System.EventHandler(this.RshChkBox_CheckedChanged);
             // 
+            // ExchangeChkBox
+            // 
+            this.ExchangeChkBox.AutoSize = true;
+            this.ExchangeChkBox.Location = new System.Drawing.Point(1095, 46);
+            this.ExchangeChkBox.Name = "ExchangeChkBox";
+            this.ExchangeChkBox.Size = new System.Drawing.Size(74, 17);
+            this.ExchangeChkBox.TabIndex = 44;
+            this.ExchangeChkBox.Text = "Exchange";
+            this.ExchangeChkBox.UseVisualStyleBackColor = true;
+            this.ExchangeChkBox.CheckedChanged += new System.EventHandler(this.ExchangeChkBox_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1330, 1049);
+            this.Controls.Add(this.ExchangeChkBox);
             this.Controls.Add(this.RshChkBox);
             this.Controls.Add(this.TestBtn);
             this.Controls.Add(this.AditionalOptionsChkBox);
@@ -246,6 +259,7 @@
         private System.Windows.Forms.CheckBox AditionalOptionsChkBox;
         private System.Windows.Forms.Button TestBtn;
         private System.Windows.Forms.CheckBox RshChkBox;
+        private System.Windows.Forms.CheckBox ExchangeChkBox;
     }
 }
 

@@ -13,8 +13,6 @@ namespace CopyDel
 {
     public partial class Form1 : Form
     {
-        //private string Dir 
-        //private System.Security.Principal.WindowsIdentity _principal;
         private List<CopyList> AdditionalCopyList = new List<CopyList>();
         private List<CopyList> CheckFileList = new List<CopyList>();
         private object _context;
@@ -23,6 +21,7 @@ namespace CopyDel
         private bool serchInDirectory = true;
         private bool DataGruDirectoryMode = false;
         private string[] FileFilter = new string[1]{"*.*"};
+        private RshForm RshForm;
 
         public Form1()
         {
@@ -34,6 +33,7 @@ namespace CopyDel
             this.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
 
             checkFilesBox.Checked = true;
+            ExchangeChkBox.Visible = false;
             _context = SynchronizationContext.Current;
         }
         private async void FindCopy(bool Del = false)
@@ -204,6 +204,9 @@ namespace CopyDel
 
         private void RefreshDataGru(List<CopyList> copyList)
         {
+            if(copyList.Count>0) ExchangeChkBox.Visible = true;
+            else ExchangeChkBox.Visible = false;
+
             BindingSource bind = new BindingSource { DataSource = copyList };
             dataGru.DataSource = bind;
             dataGru.Columns["File"].Width = 750;
@@ -359,37 +362,6 @@ namespace CopyDel
 
         private void DelCopyBtn_Click(object sender, EventArgs e) => FindCopy(true);
         private void ShowCopyBtn_Click(object sender, EventArgs e) => FindCopy();
-        //private void DirInfoBtn_Click(object sender, EventArgs e)
-        //{
-        //    if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
-        //    {
-        //        string txt = string.Empty;
-        //        List< DirInfo > dirInfoList = new List< DirInfo >();
-        //        DirectoryInfo Dires = new DirectoryInfo(textdir.Text);
-        //        foreach (var Dir in Dires.GetDirectories())
-        //        {
-        //            var Files = Directory.GetFiles(Dir.FullName, "*.*", SearchOption.AllDirectories);
-        //            long size = Files.Select(x => new FileInfo(x).Length).Sum();
-
-        //            dirInfoList.Add(new DirInfo
-        //            {
-        //                Name = Dir.FullName,
-        //                FileNumber = Files.Count(),
-        //                Size = size,
-        //                TextSize = size > 1048576 ? (size / 1048576).ToString() + " Mb" : size + " Kb"
-        //            });
-        //            txt += Dir.FullName + "\\" + Files.Count() + "\\" + size + "\n";
-        //        }
-        //        dirInfoList = dirInfoList.OrderByDescending(x => x.Size).ToList();
-        //        dataGru.DataSource = null;
-        //        BindingSource bind = new BindingSource { DataSource = dirInfoList };
-        //        dataGru.DataSource = bind;
-        //        DataGruDirectoryMode = true;
-
-        //        RTB.Text = txt;
-        //    }
-        //    else RTB.Text = "Err такой папки не ообнаруженно!!!\n" + textdir.Text;
-        //}
         private void CountFilesInDirBtn_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(textdir.Text) && Directory.Exists(textdir.Text))
@@ -509,7 +481,7 @@ namespace CopyDel
 
         private void TestBtn_Click(object sender, EventArgs e)=>CheckBox();
 
-        RshForm RshForm;
+        
         private void RshChkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (RshChkBox.Checked)
@@ -528,6 +500,12 @@ namespace CopyDel
                 }
                 else RshChkBox.Checked = false;
             }
+        }
+
+        private void ExchangeChkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            for (int i = dataGru.RowCount - 1; i > -1; i--)
+                dataGru["ForDel", i].Value = !(bool)dataGru["ForDel", i].Value;
         }
     }
 }
