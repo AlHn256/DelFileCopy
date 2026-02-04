@@ -11,7 +11,6 @@ namespace CopyDel.Models
         private List<CopyList> CheckFileList { get; set; }
         private String Dir { get; set; }
         private long MaxLenghtFile { get; set; }
-        //private SearchOption serrchOption { get; set; }
         private int serrchOption { get; set; }
         private bool _canselled { get; set; }
         private string[] FileFilter { get; set; } = new string[1] { "*.*" };
@@ -24,8 +23,6 @@ namespace CopyDel.Models
             _canselled = false;
             CheckFileList = new List<CopyList>();
             FileFilter = fileFilter;
-            //if(srchOptions) serrchOption = SearchOption.AllDirectories;
-            //else serrchOption = SearchOption.TopDirectoryOnly;
             if (srchOptions) serrchOption = 1;
             else serrchOption = 0;
         }
@@ -33,14 +30,6 @@ namespace CopyDel.Models
         public List<CopyList> MadeList(object param)
         {
             SynchronizationContext context = (SynchronizationContext)param;
-            // Пора переезжать на NetCore
-            //string[] dirs = Directory.GetFiles(Dir, "*.jpg",
-            //    new EnumerationOptions
-            //    {
-            //        IgnoreInaccessible = true,
-            //        RecurseSubdirectories = true
-            //    }
-            //);
             FileInfo[] fileList = new FileInfo[0];
             
             if (FileFilter.Length > 0) fileList = fileEdit.SearchFiles(Dir, FileFilter, serrchOption);
@@ -54,7 +43,6 @@ namespace CopyDel.Models
                 {
                     if (_canselled) break;
                     string file = fileInf.FullName;
-                    //FileInfo fileInf = new FileInfo(file);
                     if (MaxLenghtFile == 0)
                     {
                         string md5 = fileEdit.ComputeMD5Checksum(file);
@@ -74,34 +62,6 @@ namespace CopyDel.Models
                 context.Send(OnProgressChanged, 100);
             }
 
-            //string[] dirs = Directory.GetFiles(Dir, "*", serrchOption);
-            //int dirsLength = dirs.Length;
-            //if (dirsLength != 0)
-            //{
-            //    int i = 0;
-            //    foreach (string file in dirs)
-            //    {
-            //        if (_canselled) break;
-
-            //        FileInfo fileInf = new FileInfo(file);
-            //        if (MaxLenghtFile == 0)
-            //        {
-            //            string md5 = fileEdit.ComputeMD5Checksum(file);
-            //            CheckFileList.Add(new CopyList(file, md5, fileInf.Length));
-            //        }
-            //        else
-            //        {
-            //            if (fileInf.Length < MaxLenghtFile)
-            //            {
-            //                string md5 = fileEdit.ComputeMD5Checksum(file);
-            //                CheckFileList.Add(new CopyList(file, md5));
-            //            }
-            //            else CheckFileList.Add(new CopyList(file, "", fileInf.Length));
-            //        }
-            //        context.Send(OnProgressChanged, ++i * 100 / dirsLength);
-            //    }
-            //    context.Send(OnProgressChanged, 100);
-            //}
             return CheckFileList;
         }
 

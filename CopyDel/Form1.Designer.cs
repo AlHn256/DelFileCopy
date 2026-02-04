@@ -161,7 +161,7 @@
             // CountFilesInDirBtn
             // 
             this.CountFilesInDirBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CountFilesInDirBtn.Location = new System.Drawing.Point(539, 42);
+            this.CountFilesInDirBtn.Location = new System.Drawing.Point(630, 43);
             this.CountFilesInDirBtn.Name = "CountFilesInDirBtn";
             this.CountFilesInDirBtn.Size = new System.Drawing.Size(97, 23);
             this.CountFilesInDirBtn.TabIndex = 40;
@@ -183,7 +183,7 @@
             // TestBtn
             // 
             this.TestBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.TestBtn.Location = new System.Drawing.Point(642, 42);
+            this.TestBtn.Location = new System.Drawing.Point(733, 43);
             this.TestBtn.Name = "TestBtn";
             this.TestBtn.Size = new System.Drawing.Size(97, 23);
             this.TestBtn.TabIndex = 42;
@@ -205,11 +205,11 @@
             // ExchangeChkBox
             // 
             this.ExchangeChkBox.AutoSize = true;
-            this.ExchangeChkBox.Location = new System.Drawing.Point(1095, 46);
+            this.ExchangeChkBox.Location = new System.Drawing.Point(539, 46);
             this.ExchangeChkBox.Name = "ExchangeChkBox";
-            this.ExchangeChkBox.Size = new System.Drawing.Size(74, 17);
+            this.ExchangeChkBox.Size = new System.Drawing.Size(70, 17);
             this.ExchangeChkBox.TabIndex = 44;
-            this.ExchangeChkBox.Text = "Exchange";
+            this.ExchangeChkBox.Text = "V Revers";
             this.ExchangeChkBox.UseVisualStyleBackColor = true;
             this.ExchangeChkBox.CheckedChanged += new System.EventHandler(this.ExchangeChkBox_CheckedChanged);
             // 

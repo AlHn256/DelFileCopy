@@ -33,7 +33,7 @@ namespace CopyDel
             this.DragDrop += new DragEventHandler(WindowsForm_DragDrop);
 
             checkFilesBox.Checked = true;
-            ExchangeChkBox.Visible = false;
+            //ExchangeChkBox.Visible = false;
             _context = SynchronizationContext.Current;
         }
         private async void FindCopy(bool Del = false)
@@ -66,14 +66,7 @@ namespace CopyDel
 
                 if (Directory.Exists(textdir.Text))
                 {
-                    long maxLenghtFile = 0;
-                    long.TryParse(MaxLenghtFile.Text, out maxLenghtFile);
-
-                    //string[] fileFilter = new string[0]{ };
-                    //string[] fileFilter = new string[2] { "*.aspx", "*.cs" };
-                    //if (fileFilter.Count() == 0) 
-                    //if(RshChkBox.Checked && fileFilter.Count()>0) fileList = new FileList(textdir.Text, maxLenghtFile, FileFilter);
-                    //else fileList = new FileList(textdir.Text, maxLenghtFile, new string[1] { "*.*" });
+                    long.TryParse(MaxLenghtFile.Text, out long maxLenghtFile);
                     fileList = new FileList(textdir.Text, maxLenghtFile, FileFilter);
                     fileList.ProcessChanged += worker_ProcessChanged;
                     RTB.Text = "Start search" + "\nDir - " + textdir.Text;
@@ -285,8 +278,7 @@ namespace CopyDel
         }
         private void MaxLenghtFile_TextChanged(object sender, EventArgs e)
         {
-            long Long = 0;
-            if (!long.TryParse(MaxLenghtFile.Text, out Long))MaxLenghtFile.Text = "0";
+            if (!long.TryParse(MaxLenghtFile.Text, out long Long))MaxLenghtFile.Text = "0";
         }
         private void worker_ProcessChanged(int progress)
         {
